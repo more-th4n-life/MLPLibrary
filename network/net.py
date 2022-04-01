@@ -6,7 +6,7 @@ import numpy as np
 class Net:
     def __init__(self, optimizer=SGD, criterion=CrossEntropyLoss):
         self.layers, self.size = [], 0
-        self.optimizer = self.cache = optimizer
+        self.optimizer = optimizer
         self.criterion = criterion
 
     def add(self, layer):
