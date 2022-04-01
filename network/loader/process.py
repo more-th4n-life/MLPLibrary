@@ -25,7 +25,7 @@ def pca(data, n_comp=2):
     
 def get_data():
     ld = lambda fn: load(fn)
-    root = "./library/data/"
+    root = "./data/"
     return \
     ld(root + "train_data.npy"), \
     ld(root + "train_label.npy"), \
