@@ -27,9 +27,6 @@ class CrossEntropyLoss(Loss):
         return (e_out) / np.sum(e_out, axis=1, keepdims=True)
 
     def forward(self, x, label):
-        """
-        Returns 
-        """
         prob = self.softmax(x, x.shape[0])
         self.cache = label, prob
         return -np.sum(np.multiply(label, np.log(prob + self.epsilon))) / x.shape[0] # prevent log(0)

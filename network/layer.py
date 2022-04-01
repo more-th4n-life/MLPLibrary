@@ -28,8 +28,8 @@ class Linear(Layer):
         self.indim, self.outdim = indim, outdim
         
         # initialize weights and bias
-        self.W = xavier(gain=1, size=(indim, outdim)) # Xavier init for ReLU
-        self.b = xavier(gain=1, size=(1, outdim)) # Xavier init for ReLU
+        self.W = xavier(gain=1, size=(indim, outdim)) 
+        self.b = xavier(gain=1, size=(1, outdim)) 
 
         self.dW = np.zeros((indim, outdim))
         self.db = np.zeros((1, outdim))
@@ -90,9 +90,6 @@ class ReLU(Activation):
 
 class LeakyReLU(Activation):
     def __init__(self):
-        """
-        Rectified Linear Unit max(x, 0)
-        """
         self.leak = 0.03
 
     def forward(self, x):
