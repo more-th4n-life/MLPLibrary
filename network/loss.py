@@ -16,8 +16,8 @@ class CrossEntropyLoss(Loss):
     Calc softmax then negative log-likelihood loss
     """
     def __init__(self):
-        self.prob, self.label = None, None
-        self.epsilon = 1e-09
+        self.prob, self.label, self.logit = None, None, None
+        self.epsilon = 1e-10
 
     def softmax(self, x):
         """
@@ -31,13 +31,16 @@ class CrossEntropyLoss(Loss):
         Uses softmax to calculate Cross entropy loss
         """
         self.prob, self.label = self.softmax(x), label
-        return -np.mean(np.log(self.prob + self.epsilon) * label)  # prevent log(0)
-
+        self.logit = -np.log(self.prob + self.epsilon)
+        
+        return np.sum(self.logit * label) / self.prob.shape[0] / self.label.shape[1]  # prevent log(0)
+    
     def backward(self):
         """
         Returns difference between softmax probs and ground truth for update
         """
         return (self.prob - self.label) / self.prob.shape[0]
+
 
     def __call__(self, x, label):
         return self.forward(x, label)
@@ -49,11 +52,21 @@ if __name__ == "__main__":
     x = np.array([[-0.8,  0.5,  0.4, -1.1,  -1.6,  0.2, 1.2, 3.1, 2.0, -0.1]])
 
     label = one_hot(7, 10)
-    print(x)
-    print(label)
+    #print(x)
+    #print(label)
 
-    s = ce.softmax(x, x.shape[0])
-    print(s)
+    s = ce.softmax(x)
+    #print(s)
 
-    print(ce.forward(x, label))
-    print(ce.backward())
+    print(ce.forward(x, label)[0])
+    #print(ce.backward())
+
+    x = ce.forward(x, label)[0]
+    #print(np.sum(x) / x.shape[1])
+
+    print(x.shape[1])
+
+    #print(np.mean(x))
+
+    y = ce.backward()
+    print(y)

@@ -84,6 +84,7 @@ class Net:
                 self.reset_gradients()
                 out = self.forward(x)
                 loss = self.criterion(out, label)
+                
                 pred, target = np.argmax(out, axis=1), np.argmax(label, axis=1)
                 
                 self.backward(self.criterion.backward())

@@ -5,8 +5,8 @@ def xavier(size, gain):
     """
     Helper function for Xavier initialisation
     """
-    i = -gain * np.sqrt(6. / np.sum(size))
-    return np.random.uniform(low=i, high=-i, size=size)
+    i = gain * np.sqrt(6. / np.sum(size))
+    return np.random.uniform(low = -i, high = i, size = size)
 
 class Layer():
     """
@@ -35,8 +35,9 @@ class Linear(Layer):
         self.indim, self.outdim = indim, outdim
         
         # initialize weights and bias (currently using Xavier)
-        self.W = xavier(gain=1, size=(indim, outdim)) 
-        self.b = xavier(gain=1, size=(1, outdim)) 
+
+        self.W = xavier((indim, outdim), gain=1)
+        self.b = xavier((1, outdim), gain=1)
 
         self.dW = np.zeros((indim, outdim))
         self.db = np.zeros((1, outdim))

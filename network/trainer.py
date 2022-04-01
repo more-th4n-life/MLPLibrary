@@ -29,7 +29,7 @@ def network3():
     """
     train_loader, valid_loader, test_loader = random_sample_loaders()
 
-    mlp = Net(optimizer = SGD(0.1, 0.001), criterion=CrossEntropyLoss())
+    mlp = Net(optimizer = SGD(0.1, 0.01), criterion=CrossEntropyLoss())
 
     mlp.add(Linear(128, 64))
     mlp.add(LeakyReLU())
@@ -89,7 +89,7 @@ def network1():
     mlp.test(test_loader)
 
 def main():
-    network3()
+    network1()
 
 if __name__ == "__main__":
     main()
