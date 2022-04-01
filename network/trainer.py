@@ -6,7 +6,9 @@ from loader.data_loader import *
 from loader.test_loader import *
 
 def network_mb():
-
+    """
+    Testing train_mb which doesn't use data and supports mini batch
+    """
     train_set, val_set, test_set = train_val_test()
 
     mlp = Net(optimizer = SGD(0.01, 0.001), criterion=CrossEntropyLoss())
@@ -22,6 +24,9 @@ def network_mb():
     mlp.train_mb(train_set, val_set, 100, batch_size=20)
 
 def network3():
+    """
+    Testing LeakyReLU
+    """
     train_loader, valid_loader, test_loader = example_loaders()
 
     mlp = Net(optimizer = SGD(0.1, 0.001), criterion=CrossEntropyLoss())
@@ -38,6 +43,9 @@ def network3():
     mlp.test(test_loader)
 
 def network2():
+    """
+    Testing deep network
+    """
     train_loader, valid_loader, test_loader = example_loaders()
 
     mlp = Net(optimizer = SGD(0.1, 0.001), criterion=CrossEntropyLoss())
@@ -62,6 +70,9 @@ def network2():
     mlp.test(test_loader)
 
 def network1():
+    """
+    Testing normal network
+    """
     train_loader, valid_loader, test_loader = example_loaders()
 
     mlp = Net(optimizer = SGD(0.1, 0.001), criterion=CrossEntropyLoss())

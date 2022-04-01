@@ -4,28 +4,53 @@ from layer import Layer
 import numpy as np
 
 class Net:
+    """
+    MLP Model class 
+
+    Currently supports: 
+        Layers: Linear 
+        Activations: ReLU, LeakyReLU
+        Loss Criteria: CrossEntropyLoss (uses Softmax 'activation' on output layer)
+        Optimizer: SGD + Weight Decay 
+
+    """
     def __init__(self, optimizer=SGD, criterion=CrossEntropyLoss):
         self.layers, self.size = [], 0
         self.optimizer, self.criterion = optimizer, criterion
 
     def add(self, layer):
+        """
+        Add layer: e.g. Linear or Activation
+        """
         self.layers += [layer]
         self.size += 1
 
     def forward(self, x):
+        """
+        Forward pass
+        """
         for layer in self.layers:
             x = layer.forward(x)
         return x
 
     def backward(self, dy):
+        """
+        Backward pass
+        """
         for layer in self.layers[::-1]:
             dy = layer.backward(dy)
         return dy
 
     def update(self):
+        """
+        Uses optimizer to update weights and biases in each layer based on saved dW and db
+        """
         self = self.optimizer.step(self)
 
     def reset_gradients(self):
+        """
+        Zeros gradients in each layer after each training iteration
+        """
         layers = [l for l in self.layers if isinstance(l, Layer)]
         for layer in layers:
             layer.reset_gradients() 
@@ -84,7 +109,10 @@ class Net:
             print(f"Epoch: {ep+1} \t Validate Loss:{np.mean(va_loss):.6f} \t Validate Accuracy: {np.mean(va_accu):.6f}")
 
     def train(self, train_loader, valid_loader, epochs):
-
+        """
+        A training function, load in train / validate data loaders
+        Batch size is applied within loaders themselves that can be configured in loader/test_loader.py where loaders are imported
+        """
         for ep in range(epochs):
             tr_loss, tr_accu = [], []
             va_loss, va_accu = [], []
@@ -117,6 +145,9 @@ class Net:
             print(f"Epoch: {ep+1} \t Validate Loss:{np.mean(va_loss):.6f} \t Validate Accuracy: {np.mean(va_accu):.6f}")
 
     def test2(self, test_set):
+        """
+        Still being fixed, to work with train_mb 
+        """
         test_x, test_y = test_set
             
         test_loss = []
@@ -153,7 +184,9 @@ class Net:
             print(f'Test Accuracy of\t{i}: {correct[i] / size[i] * 100:.2f}% ({np.sum(correct[i])}/{np.sum(size[i])})')
 
     def test(self, test_loader):
-
+        """
+        Test function, loads in test data loader 
+        """
         test_loss = []
         correct = [0] * 10
         size = [0] * 10

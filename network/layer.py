@@ -110,12 +110,15 @@ class LeakyReLU(Activation):
         self.leak = 0.03
 
     def forward(self, x):
+        """
+        If > 0 return x else return leaky amount * x
+        """
         self.x = x
         return x * (x > 0) + (x <= 0) * self.leak * x
 
     def backward(self, dy):
         """
-        If < 0 ret leak
+        If > 0 ret 1 else return leaky amount
         """
         return dy * (self.x > 0) + (self.x <= 0) * dy * self.leak
 

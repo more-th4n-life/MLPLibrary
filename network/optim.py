@@ -2,10 +2,18 @@ import numpy as np
 from layer import Layer
 
 class SGD:
-    def __init__(self, learning_rate, weight_decay):
+    """
+    Stochastic Gradient Descent: Also implements weight decay (can be removed by setting to zero)
+
+    To add momentum etc. just adds another terms
+    """
+    def __init__(self, learning_rate, weight_decay = 0):
         self.lr, self.wd = learning_rate, weight_decay
         
     def step(self, network):
+        """
+        Update weights and biases in each layer wrt learned dW and db AND learning rate (+ weight decay) term
+        """
         layers = [l for l in network.layers if isinstance(l, Layer)]
 
         for layer in layers:

@@ -27,11 +27,17 @@ class CrossEntropyLoss(Loss):
         return (e_out) / np.sum(e_out, axis=1, keepdims=True)
 
     def forward(self, x, label):
+        """
+        Uses softmax to calculate Cross entropy loss
+        """
         prob = self.softmax(x, x.shape[0])
         self.cache = label, prob
-        return -np.sum(np.multiply(label, np.log(prob + self.epsilon))) / x.shape[0] # prevent log(0)
+        return -np.mean(np.log(prob + self.epsilon) * label)  # prevent log(0)
 
     def backward(self):
+        """
+        Returns difference between softmax probs and ground truth for update
+        """
         label, prob = self.cache
         return (prob - label) / prob.shape[0]
 
