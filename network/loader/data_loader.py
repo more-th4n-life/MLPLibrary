@@ -21,7 +21,18 @@ def worker_func(data, idx_queue, out_queue):
 
 
 class DataLoader(Loader):
+    """
+    Tried to implement my own DataLoader similar to PyTorch 
+
+    Currently does not support random sampling which which would be more appropriate for batch training
+    """
     def __init__(self, data, batch_size=20, n_workers=1, prefetch=2, fn=collate):
+        """
+        Default collate function used, and batch size = 20
+        Increasing n_workers can provide functionality of loading another batch at same time a current is loading
+            
+            As our data is not so large it may be unnecessary
+        """
         super().__init__(data, batch_size, fn)
 
         self.n_workers, self.prefetch = n_workers, prefetch
@@ -44,6 +55,9 @@ class DataLoader(Loader):
         self.prefetch_batch()
 
     def prefetch_batch(self):
+        """
+        Fetches next batch
+        """
         while (not len(self.data) <= self.prefetch_idx and self.prefetch_idx < self.idx + 2*self.batch*self.n_workers):
             # not 2 batches ahead and not end of data
             idx = self.prefetch_idx
