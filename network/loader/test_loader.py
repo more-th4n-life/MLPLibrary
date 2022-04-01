@@ -23,6 +23,33 @@ def train_val_test():
 
     return train_set, valid_set, test_set
 
+def random_sample_loaders():
+    data = get_data()
+    train_data = standardize(data[0])
+    train_label = one_hot(data[1], 10)
+    test_data = standardize(data[2])
+    test_label = one_hot(data[3], 10)
+
+    data = Dataset(train_data, train_label)
+    test = Dataset(test_data, test_label)
+
+    num_train = len(data)
+    idx = list(range(num_train))
+    val_size = 0.2
+    spl = int(np.floor(val_size * num_train))
+
+    train_idx = idx[spl:]
+    valid_idx = idx[:spl]
+    train_sampler = SubsetRandSampler(train_idx)
+    valid_sampler = SubsetRandSampler(valid_idx)
+
+    train_loader = DataLoader(data[spl:], n_workers=1, batch_size=64)
+    valid_loader = DataLoader(data[:spl], n_workers=1, batch_size=64)
+    test_loader = DataLoader(test, n_workers=1, batch_size=64)
+
+    return train_loader, valid_loader, test_loader
+
+
 def example_loaders():
     data = get_data()
     train_data = standardize(data[0])

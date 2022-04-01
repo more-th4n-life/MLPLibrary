@@ -25,9 +25,9 @@ def network_mb():
 
 def network3():
     """
-    Testing LeakyReLU
+    Testing LeakyReLU and Random Samplers for Data Loaders
     """
-    train_loader, valid_loader, test_loader = example_loaders()
+    train_loader, valid_loader, test_loader = random_sample_loaders()
 
     mlp = Net(optimizer = SGD(0.1, 0.001), criterion=CrossEntropyLoss())
 

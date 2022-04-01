@@ -24,9 +24,9 @@ class DataLoader(Loader):
     """
     Tried to implement my own DataLoader similar to PyTorch 
 
-    Currently does not support random sampling which which would be more appropriate for batch training
+    Just added random sampling which which would be more appropriate for batch training (See sampler.py)
     """
-    def __init__(self, data, batch_size=20, n_workers=1, prefetch=2, fn=collate):
+    def __init__(self, data, batch_size=20, n_workers=1, prefetch=2, fn=collate, sampler=None):
         """
         Default collate function used, and batch size = 20
         Increasing n_workers can provide functionality of loading another batch at same time a current is loading
@@ -42,7 +42,8 @@ class DataLoader(Loader):
         self.workers = []
         self.work_cycle = cycle(range(n_workers))
         self.cache = {}
-        self.prefetch_idx = 0
+        self.sampler = sampler
+        self.prefetch_idx = next(sampler) if sampler else 0
 
         for _ in range(n_workers):
             idx_queue = Queue()
@@ -61,7 +62,7 @@ class DataLoader(Loader):
         while (not len(self.data) <= self.prefetch_idx and self.prefetch_idx < self.idx + 2*self.batch*self.n_workers):
             # not 2 batches ahead and not end of data
             idx = self.prefetch_idx
-            self.prefetch_idx += 1
+            self.prefetch_idx = next(self.sampler) if self.sampler else self.prefetch_idx + 1
 
             self.idx_queues[next(self.work_cycle)].put(idx)
 
@@ -83,11 +84,17 @@ class DataLoader(Loader):
             it = self.cache[self.idx]
             del self.cache[self.idx]
 
-        self.idx += 1
+        self.idx = next(self.sampler) if self.sampler else self.idx + 1
         return it
 
     def __iter__(self):
-        self.idx, self.prefetch_idx, self.cache = 0, 0, {}
+        if self.sampler:
+            self.idx = next(self.sampler)
+            self.prefetch_idx = next(self.sampler)
+        else:
+            self.idx, self.prefetch_idx = 0, 0
+
+        self.cache = {}
         self.prefetch_batch()
         return self
 
