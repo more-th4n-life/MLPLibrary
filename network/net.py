@@ -6,8 +6,7 @@ import numpy as np
 class Net:
     def __init__(self, optimizer=SGD, criterion=CrossEntropyLoss):
         self.layers, self.size = [], 0
-        self.optimizer = optimizer
-        self.criterion = criterion
+        self.optimizer, self.criterion = optimizer, criterion
 
     def add(self, layer):
         self.layers += [layer]
@@ -18,11 +17,6 @@ class Net:
             x = layer.forward(x)
         return x
 
-    def reset_gradients(self):
-        layers = [l for l in self.layers if isinstance(l, Layer)]
-        for layer in layers:
-            layer.reset_gradients() 
-
     def backward(self, dy):
         for layer in self.layers[::-1]:
             dy = layer.backward(dy)
@@ -30,6 +24,11 @@ class Net:
 
     def update(self):
         self = self.optimizer.step(self)
+
+    def reset_gradients(self):
+        layers = [l for l in self.layers if isinstance(l, Layer)]
+        for layer in layers:
+            layer.reset_gradients() 
 
     def __call__(self, x):
         return self.forward(x)

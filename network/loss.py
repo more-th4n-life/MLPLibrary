@@ -1,6 +1,9 @@
 import numpy as np
 
 class Loss():
+    """
+    Abstract class for Loss 
+    """
     def __init__(self):
         pass
     def forward(self):
@@ -10,17 +13,23 @@ class Loss():
 
 class CrossEntropyLoss(Loss):
     """
-    calc softmax then negative log-likelihood loss
+    Calc softmax then negative log-likelihood loss
     """
     def __init__(self):
         self.cache = None
         self.epsilon = 1e-09
 
     def softmax(self, x, n):
+        """
+        Returns probabilities for each class
+        """
         e_out = np.exp(x - np.amax(x, axis=1).reshape(n, 1))
         return (e_out) / np.sum(e_out, axis=1, keepdims=True)
 
     def forward(self, x, label):
+        """
+        Returns 
+        """
         prob = self.softmax(x, x.shape[0])
         self.cache = label, prob
         return -np.sum(np.multiply(label, np.log(prob + self.epsilon))) / x.shape[0] # prevent log(0)
@@ -45,5 +54,5 @@ if __name__ == "__main__":
     s = ce.softmax(x, x.shape[0])
     print(s)
 
-    #print(ce.forward(x, label))
-    #print(ce.backward())
+    print(ce.forward(x, label))
+    print(ce.backward())
