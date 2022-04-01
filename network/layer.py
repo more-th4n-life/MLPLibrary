@@ -2,10 +2,17 @@ import numpy as np
 from pyparsing import line
 
 def xavier(size, gain):
+    """
+    Helper function for Xavier initialisation
+    """
     i = -gain * np.sqrt(6. / np.sum(size))
     return np.random.uniform(low=i, high=-i, size=size)
 
 class Layer():
+    """
+    Abstract class for layer: used to differentiate b/w activations
+    i.e. For updating weights and bias 
+    """
     def __init__(self):
         pass
     def forward(self):
@@ -27,26 +34,23 @@ class Linear(Layer):
         """
         self.indim, self.outdim = indim, outdim
         
-        # initialize weights and bias
+        # initialize weights and bias (currently using Xavier)
         self.W = xavier(gain=1, size=(indim, outdim)) 
         self.b = xavier(gain=1, size=(1, outdim)) 
 
         self.dW = np.zeros((indim, outdim))
         self.db = np.zeros((1, outdim))
 
-        #self.diffW = np.zeros((indim, outdim))
-        #self.diffb = np.zeros((1, outdim))
-
     def forward(self, x):
         """
-        Apply xw + b linear transform
+        Apply wx + b linear transformations
         """
         self.x = x
         return np.dot(x, self.W) + self.b
 
     def backward(self, dy):
         """
-        Calculate gradient wrt dy
+        Calculate gradient wrt dy for update step
         """
         self.dW = np.dot(self.x.T, dy)
         self.db = np.sum(dy, axis=0, keepdims=True)
@@ -55,15 +59,22 @@ class Linear(Layer):
     def update(self, lr):
         """
         ..using optimizer method instead 
+        Update weight and bias wrt gradient from loss
         """
         self.W -= lr * self.dW
         self.b -= lr * self.db
 
     def reset_gradients(self):
+        """
+        Zero out gradients after each sample
+        """
         self.dW = np.zeros_like(self.dW)
         self.db = np.zeros_like(self.db)
 
 class Activation():
+    """
+    Abstract class for activations 
+    """
     def __init__(self):
         pass
     def forward(self):
@@ -79,22 +90,28 @@ class ReLU(Activation):
         self.x = None
 
     def forward(self, x):
+        """
+        Returns x if x > 0
+        """
         self.x = x
         return x * (x > 0)
 
     def backward(self, dy):
         """
-        If < 0 ret 0
+        If x <= 0 ret 0 else 1
         """
         return dy * (self.x > 0)
 
 class LeakyReLU(Activation):
     def __init__(self):
+        """
+        Leaky ReLU
+        """
         self.leak = 0.03
 
     def forward(self, x):
         self.x = x
-        return x * (x > 0) + (x <= 0) * x * self.leak
+        return x * (x > 0) + (x <= 0) * self.leak * x
 
     def backward(self, dy):
         """
@@ -134,3 +151,20 @@ if __name__ == "__main__":
 
     assert isinstance(linear, Layer)
     assert isinstance(reLU, Activation)
+
+
+    # LeakyReLU Tests
+
+    x = np.array([[3,2], [1,-4]])
+    lr = LeakyReLU()
+    y = lr.forward(x)
+
+    assert np.allclose(y, np.array([[3,2], [1,-0.12]]))
+
+    x = np.array([[1,1], [1,1]])
+    y = lr.backward(x)
+
+    assert np.allclose(y, np.array([[1,1], [1,0.03]]))
+
+    assert isinstance(linear, Layer)
+    assert isinstance(lr, Activation)

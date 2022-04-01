@@ -78,7 +78,7 @@ def network1():
     mlp.test(test_loader)
 
 def main():
-    network2()
+    network3()
 
 if __name__ == "__main__":
     main()
