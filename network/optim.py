@@ -1,5 +1,5 @@
 import numpy as np
-from layer import Layer
+from layer import Linear
 
 class SGD:
     """
@@ -14,7 +14,7 @@ class SGD:
         """
         Update weights and biases in each layer wrt learned dW and db AND learning rate (+ weight decay) term
         """
-        for layer in [l for l in network.layers if isinstance(l, Layer)]:
+        for layer in [l for l in network.layers if isinstance(l, Linear)]:
     
             layer.diffW *= self.momentum
             layer.diffb *= self.momentum

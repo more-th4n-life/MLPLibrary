@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class Activation:
     """
     Abstract class for activations 
@@ -48,3 +51,37 @@ class LeakyReLU(Activation):
         If > 0 ret 1 else return leaky amount
         """
         return dy * (self.x > 0) + (self.x <= 0) * dy * self.leak
+
+if __name__ == "__main__":
+
+    # ReLU Tests
+
+    x = np.array([[3,2], [1,-4]])
+    reLU = ReLU()
+    y = reLU.forward(x)
+
+    assert (y == np.array([[3,2], [1,0]])).all()
+
+    x = np.array([[1,1], [1,1]])
+    y = reLU.backward(x)
+
+    assert (y == np.array([[1,1], [1,0]])).all()
+
+    assert isinstance(linear, Layer)
+    assert isinstance(reLU, Activation)
+
+
+    # LeakyReLU Tests
+
+    x = np.array([[3,2], [1,-4]])
+    lr = LeakyReLU()
+    y = lr.forward(x)
+
+    assert np.allclose(y, np.array([[3,2], [1,-0.12]]))
+
+    x = np.array([[1,1], [1,1]])
+    y = lr.backward(x)
+
+    assert np.allclose(y, np.array([[1,1], [1,0.03]]))
+
+    assert isinstance(lr, Activation)

@@ -1,4 +1,5 @@
 from loss import CrossEntropyLoss
+from layer import Linear
 from optim import SGD
 from layer import Layer
 import numpy as np
@@ -9,28 +10,32 @@ class Net:
 
     Currently supports: 
         Layers: Linear 
-        Activations: ReLU, LeakyReLU
+        Activations: ReLU, LeakyReLU, BatchNorm
         Loss Criteria: CrossEntropyLoss (uses Softmax 'activation' on output layer)
-        Optimizer: SGD + Weight Decay 
+        Optimizer: SGD + Momentum
+        Regularizer: Weight Decay 
 
     """
-    def __init__(self, optimizer=SGD, criterion=CrossEntropyLoss):
+    def __init__(self, optimizer=SGD, criterion=CrossEntropyLoss, batch_norm=False):
         self.layers, self.size = [], 0
         self.optimizer, self.criterion = optimizer, criterion
+        self.batch_norm=batch_norm
 
     def add(self, layer):
         """
         Add layer: e.g. Linear or Activation
         """
+        if isinstance(layer, Linear) and self.batch_norm:
+            layer.batch_norm=True
         self.layers += [layer]
         self.size += 1
 
-    def forward(self, x):
+    def forward(self, x, predict=False):
         """
         Forward pass
         """
         for layer in self.layers:
-            x = layer.forward(x)
+            x = layer.forward(x, predict) if isinstance(x, Linear) and predict else layer.forward(x)
         return x
 
     def backward(self, dy):
@@ -78,8 +83,9 @@ class Net:
             END = min(START + batch_size, N)
             
             x, label = valid_x[START : END], valid_y[START : END]
-            
-            out = self.forward(x)
+
+            out = self.forward(x, predict=True)
+
             loss, prob = self.criterion(out, label)
             losses += loss * (END - START)
             pred, target = np.argmax(prob, axis=1), np.argmax(label, axis=1)
