@@ -7,8 +7,8 @@ class SGD:
 
     To add momentum etc. just adds another terms
     """
-    def __init__(self, learning_rate, weight_decay = 0):
-        self.lr, self.wd = learning_rate, weight_decay
+    def __init__(self, learning_rate=0.04, weight_decay = 0.004, momentum = 0.5):
+        self.lr, self.wd, self.momentum = learning_rate, weight_decay, momentum
         
     def step(self, network):
         """
@@ -16,6 +16,9 @@ class SGD:
         """
         for layer in [l for l in network.layers if isinstance(l, Layer)]:
     
+            layer.diffW *= self.momentum
+            layer.diffb *= self.momentum
+
             layer.diffW = self.lr * (-layer.dW - self.wd * layer.W)
             layer.diffb = -self.lr * np.mean(layer.db, axis=0)
 

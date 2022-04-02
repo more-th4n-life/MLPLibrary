@@ -37,10 +37,13 @@ class Linear(Layer):
         # initialize weights and bias (currently using Xavier)
 
         self.W = xavier((indim, outdim))
-        self.b = xavier((1, outdim))
+        self.b = np.zeros(outdim,)
+        #xavier((1, outdim))
 
         self.dW = np.zeros((indim, outdim))
         self.db = np.zeros((1, outdim))
+
+        # momentum terms
 
         self.diffW = np.zeros((indim, outdim))
         self.diffb = np.zeros((1, outdim))
