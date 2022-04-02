@@ -126,6 +126,29 @@ def network_batch_norm():
     pl.grid()
     pl.show()
 
+def network_adam_pca():
+    n_comp = 96
+
+    np.random.seed(10)
+    train_set, val_set, test_set = pca_train_val_test(n_comp = n_comp)  # take first 16 components
+
+    mlp = Net(optimizer = Adam(), criterion=CrossEntropyLoss(), L2_reg_term=0, batch_norm=False)
+
+    mlp.add(Linear(n_comp, 1024))
+    mlp.add(ReLU())
+    mlp.add(Linear(1024, 64))
+    mlp.add(ReLU())
+    mlp.add(Linear(64, 10))
+
+    CE = mlp.train_network(train_set=train_set, valid_set=val_set, epochs=200, batch_size=500)
+
+    print(mlp.validate_batch(test_set[0], test_set[1], batch_size=500))
+
+    pl.figure(figsize=(15,4))
+    pl.plot(CE)
+    pl.grid()
+    pl.show()
+
 def network_adam():
     np.random.seed(10)
     train_set, val_set, test_set = train_val_test()
@@ -174,7 +197,7 @@ def network1():
     pl.show()
 
 def main():
-    network_adam()
+    network_adam_pca()
 
 if __name__ == "__main__":
     main()
