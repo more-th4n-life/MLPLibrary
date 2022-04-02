@@ -129,23 +129,6 @@ class LeakyReLU(Activation):
         """
         return dy * (self.x > 0) + (self.x <= 0) * dy * self.leak
 
-class Softmax(Activation):
-    def __init__(self):
-        pass
-
-    def forward(self, x):
-        """
-        Returns probabilities for each class
-        """
-        clas = np.exp(x - np.max(x, axis=1, keepdims=True)) 
-        return clas / np.sum(clas, axis=1, keepdims=True)
-
-    def backward(self, dy):
-        z = np.exp(dy)
-        s = np.sum(z, axis = 1, keepdims=True)
-        a = z / s
-        da =  a * (1 - s)
-        return da
 
 if __name__ == "__main__":
 
