@@ -60,14 +60,14 @@ class Adam:
             self.v_corr["db" + str(i)] = self.v["db" + str(i)] / (1 - self.beta1 ** t)
 
             # calculate moving avg of squared gradients
-            self.s["dW" + str(i)] = self.beta2 * self.s["dW" + str(i)] + (1 - self.beta2) * (np.square(layer.dW) )
-            self.s["db" + str(i)] = self.beta2 * self.s["db" + str(i)] + (1 - self.beta2) * (np.square(layer.db) )
+            self.s["dW" + str(i)] = self.beta2 * self.s["dW" + str(i)] + (1 - self.beta2) * (np.square(layer.dW))
+            self.s["db" + str(i)] = self.beta2 * self.s["db" + str(i)] + (1 - self.beta2) * (np.square(layer.db))
 
             # correct bias with second moment estimates
             self.s_corr["dW" + str(i)] = self.s["dW" + str(i)] / (1 - self.beta2 ** t)
             self.s_corr["db" + str(i)] = self.s["db" + str(i)] / (1 - self.beta2 ** t)
 
             # update params
-            layer.W = layer.W - self.lr * self.v_corr["dW" + str(i)] / (np.sqrt(self.s_corr["dW" + str(i)]) + self.epsilon)
-            layer.b = layer.b - self.lr * self.v_corr["db" + str(i)] / (np.sqrt(self.s_corr["db" + str(i)]) + self.epsilon)
+            layer.W += -self.lr * self.v_corr["dW" + str(i)] / (np.sqrt(self.s_corr["dW" + str(i)]) + self.epsilon)
+            layer.b += -self.lr * self.v_corr["db" + str(i)] / (np.sqrt(self.s_corr["db" + str(i)]) + self.epsilon)
 
