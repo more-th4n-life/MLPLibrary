@@ -1,3 +1,4 @@
+from itertools import dropwhile
 from matplotlib.pyplot import axis
 import numpy as np
 
@@ -25,7 +26,7 @@ class Layer():
 
 class Linear(Layer):
 
-    def __init__(self, indim, outdim, alpha = 0.9):
+    def __init__(self, indim, outdim, dropout=0):
         """
         Layer: Linear y = xw + b
 
@@ -34,9 +35,9 @@ class Linear(Layer):
             outdim: outgoing m features
         """
         self.indim, self.outdim = indim, outdim
-        self.batch_norm = False     # set in network as parameter
+        self.batch_norm, self.alpha = False, None     # set in network as parameter
+        self.dropout = dropout
         self.epsilon = 1e-10
-        self.alpha = alpha
         
         # initialize weights and bias (Xavier init)
         self.W = xavier((indim, outdim))
@@ -85,6 +86,21 @@ class Linear(Layer):
 
         return (self.gamma * (dy.shape[0] * dy - self.norm * dgamma - dbeta)) / (self.batch_sd * dy.shape[0])
 
+    def dropout_forward(self, x, predict):
+        """
+        Disable dropout during test / validation, only used during training 
+        """
+        if predict:  return x
+        
+        self.mask = np.random.binomial(1, (1 - self.dropout), size = x.shape)
+        return x * self.mask / (1 - self.dropout)
+
+    def dropout_backward(self, dy):
+        """
+        Dropout correction for backward pass
+        """
+        return dy * self.mask / (1 - self.dropout)
+
     def forward(self, x, predict=False):
         """
         Apply wx + b linear transformations
@@ -95,9 +111,12 @@ class Linear(Layer):
         if self.batch_norm:
             out = self.batch_norm_forward(out, predict)
 
+        if self.dropout:
+            out = self.dropout_forward(out, predict)
+
         return out
 
-    def backward(self, dy):
+    def backward(self, dy, reg_term=0):
         """
         Calculate gradient wrt dy for update step
         """
@@ -107,15 +126,14 @@ class Linear(Layer):
         self.dW = self.x.T @ dy
         self.db = np.sum(dy, axis=0, keepdims=True)
 
-        return dy @ self.W.T
+        if self.dropout:
+            dy = self.dropout_backward(dy)
+        
+        # L2 Regularization not equivalent to weight decay (however is understood to be for SGD) 
+        if reg_term:
+            self.dW = self.x.T @ dy - reg_term * self.W / self.x.shape[0]
 
-    def update(self, lr):
-        """
-        ..using optimizer method instead 
-        Update weight and bias wrt gradient from loss
-        """
-        self.W -= lr * self.dW
-        self.b -= lr * self.db
+        return dy @ self.W.T
 
     def reset_gradients(self):
         """

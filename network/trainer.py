@@ -1,3 +1,4 @@
+import re
 from layer import *
 from loss import *
 from net import *
@@ -130,17 +131,16 @@ def network1():
     """
     Testing normal network
     """
-    #train_loader, valid_loader, test_loader = example_loaders()
-
+    np.random.seed(10)
     train_set, val_set, test_set = train_val_test()
 
-    mlp = Net(optimizer = SGD(learning_rate=0.04, weight_decay=0, momentum=0.5), criterion=CrossEntropyLoss())
+    mlp = Net(optimizer = SGD(learning_rate=0.01, momentum=0.5), criterion=CrossEntropyLoss(), reg_term=0.01)
 
-    mlp.add(Linear(128, 1024))
+    mlp.add(Linear(128, 1024, dropout=0.2))
     mlp.add(ReLU())
-    mlp.add(Linear(1024, 64))
+    mlp.add(Linear(1024, 64, dropout=0.2))
     mlp.add(ReLU())
-    mlp.add(Linear(64, 10))
+    mlp.add(Linear(64, 10, dropout=0.2))
 
     CE = mlp.train_network(train_set=train_set, valid_set=val_set, epochs=100, batch_size=500)
 
@@ -152,7 +152,7 @@ def network1():
     pl.show()
 
 def main():
-    network_bn2()
+    network1()
 
 if __name__ == "__main__":
     main()

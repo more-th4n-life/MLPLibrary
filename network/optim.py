@@ -7,7 +7,7 @@ class SGD:
 
     To add momentum etc. just adds another terms
     """
-    def __init__(self, learning_rate=0.04, weight_decay = 0.004, momentum = 0.5):
+    def __init__(self, learning_rate=0.04, weight_decay = 0, momentum = 0.5):
         self.lr, self.wd, self.momentum = learning_rate, weight_decay, momentum
         
     def step(self, network):

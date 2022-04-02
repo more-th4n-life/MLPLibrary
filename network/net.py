@@ -12,21 +12,27 @@ class Net:
         Layers: Linear 
         Activations: ReLU, LeakyReLU, BatchNorm
         Loss Criteria: CrossEntropyLoss (uses Softmax 'activation' on output layer)
-        Optimizer: SGD + Momentum
-        Regularizer: Weight Decay 
+        Optimizer: SGD + Momentum (Weight Decay added)
+        Regularization: 
+            L2 Reg
+            Dropout (Layer specific can set higher percent for near input layers)
+            Batch Norm (chosen to toggle for whole network for convenience)
 
     """
-    def __init__(self, optimizer=SGD, criterion=CrossEntropyLoss, batch_norm=False):
+    def __init__(self, optimizer=SGD, criterion=CrossEntropyLoss, batch_norm=False, alpha=0.9, reg_term=0.1):
         self.layers, self.size = [], 0
         self.optimizer, self.criterion = optimizer, criterion
-        self.batch_norm=batch_norm
+        self.batch_norm, self.alpha = batch_norm, alpha  # alpha only used if batch norm is set
+        self.reg_term = reg_term  # dropout percentage and L2 regularization term
 
     def add(self, layer):
         """
         Add layer: e.g. Linear or Activation
         """
-        if isinstance(layer, Linear) and self.batch_norm:
-            layer.batch_norm=True
+        if isinstance(layer, Linear): 
+            if self.batch_norm:
+                layer.batch_norm, layer.alpha = True, self.alpha
+            
         self.layers += [layer]
         self.size += 1
 
@@ -35,7 +41,7 @@ class Net:
         Forward pass
         """
         for layer in self.layers:
-            x = layer.forward(x, predict) if isinstance(x, Linear) and predict else layer.forward(x)
+            x = layer.forward(x, predict) if isinstance(layer, Linear) else layer.forward(x)
         return x
 
     def backward(self, dy):
@@ -43,7 +49,7 @@ class Net:
         Backward pass
         """
         for layer in self.layers[::-1]:
-            dy = layer.backward(dy)
+            dy = layer.backward(dy, self.reg_term) if isinstance(layer, Linear) else layer.backward(dy)
 
     def update(self):
         """
