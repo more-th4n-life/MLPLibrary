@@ -67,7 +67,6 @@ if __name__ == "__main__":
 
     assert (y == np.array([[1,1], [1,0]])).all()
 
-    assert isinstance(linear, Layer)
     assert isinstance(reLU, Activation)
 
 
