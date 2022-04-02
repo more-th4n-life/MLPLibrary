@@ -1,7 +1,6 @@
 import numpy as np
-from pyparsing import line
 
-def xavier(size, gain):
+def xavier(size, gain=1):
     """
     Helper function for Xavier initialisation
     """
@@ -36,8 +35,8 @@ class Linear(Layer):
         
         # initialize weights and bias (currently using Xavier)
 
-        self.W = xavier((indim, outdim), gain=1)
-        self.b = xavier((1, outdim), gain=1)
+        self.W = xavier((indim, outdim))
+        self.b = xavier((1, outdim))
 
         self.dW = np.zeros((indim, outdim))
         self.db = np.zeros((1, outdim))
@@ -61,6 +60,7 @@ class Linear(Layer):
 
         self.dW = self.x.T @ dy
         self.db = np.sum(dy, axis=0, keepdims=True)
+        
         return dy @ self.W.T
 
     def update(self, lr):

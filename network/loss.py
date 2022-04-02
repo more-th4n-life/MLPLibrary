@@ -39,7 +39,7 @@ class CrossEntropyLoss(Loss):
         """
         Returns difference between softmax probs and ground truth for update
         """
-        return (self.prob - self.label) / self.prob.shape[1]
+        return (self.prob - self.label) / self.prob.shape[0]
        
 
     def __call__(self, x, label):

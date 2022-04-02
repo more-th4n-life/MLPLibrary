@@ -76,7 +76,7 @@ def network1():
     #train_loader, valid_loader, test_loader = example_loaders()
     train_set, val_set, test_set = train_val_test()
 
-    mlp = Net(optimizer = SGD(0.07, 0.00001), criterion=CrossEntropyLoss())
+    mlp = Net(optimizer = SGD(0.07), criterion=CrossEntropyLoss())
 
     mlp.add(Linear(128, 96))
     mlp.add(LeakyReLU())
