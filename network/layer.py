@@ -1,5 +1,3 @@
-from itertools import dropwhile
-from matplotlib.pyplot import axis
 import numpy as np
 
 def xavier(size, gain=1):
@@ -35,7 +33,7 @@ class Linear(Layer):
             outdim: outgoing m features
         """
         self.indim, self.outdim = indim, outdim
-        self.batch_norm, self.alpha = False, None     # set in network as parameter
+        self.batch_norm, self.alpha, self.L2_reg_term = False, None, None    # set within network as parameters
         self.dropout = dropout
         self.epsilon = 1e-10
         
@@ -56,14 +54,16 @@ class Linear(Layer):
         self.run_var = np.ones(outdim,)
         self.run_mean = np.zeros(outdim,)
 
-    def batch_norm_forward(self, x, predict=False):
+        # predict toggled for validation / testing
+        self.predict = False
+
+    def batch_norm_forward(self, x):
         """
         Batch norm forward pass using linear layer output
         If predict (validation / test): 
             Use running mean / var from training to compute norm
         """
-        if predict:
-            self.norm = (x - self.run_mean) / np.sqrt(self.run_var + self.epsilon)
+        if self.predict: self.norm = (x - self.run_mean) / np.sqrt(self.run_var + self.epsilon)
 
         else:
             self.batch_sd = np.sqrt(np.var(x, axis=0) + self.epsilon)
@@ -86,12 +86,12 @@ class Linear(Layer):
 
         return (self.gamma * (dy.shape[0] * dy - self.norm * dgamma - dbeta)) / (self.batch_sd * dy.shape[0])
 
-    def dropout_forward(self, x, predict):
+    def dropout_forward(self, x):
         """
         Disable dropout during test / validation, only used during training 
         """
-        if predict:  return x
-        
+        if self.predict: return x
+
         self.mask = np.random.binomial(1, (1 - self.dropout), size = x.shape)
         return x * self.mask / (1 - self.dropout)
 
@@ -101,37 +101,38 @@ class Linear(Layer):
         """
         return dy * self.mask / (1 - self.dropout)
 
-    def forward(self, x, predict=False):
+    def forward(self, x):
         """
         Apply wx + b linear transformations
         """
         self.x = x
         out = x @ self.W + self.b
 
+        # batch_norm before dropout for better performance https://arxiv.org/abs/1801.05134 
         if self.batch_norm:
-            out = self.batch_norm_forward(out, predict)
+            out = self.batch_norm_forward(out)
 
         if self.dropout:
-            out = self.dropout_forward(out, predict)
+            out = self.dropout_forward(out)
 
         return out
 
-    def backward(self, dy, reg_term=0):
+    def backward(self, dy):
         """
         Calculate gradient wrt dy for update step
         """
-        if self.batch_norm:
-            dy = self.batch_norm_backward(dy)
-
-        self.dW = self.x.T @ dy
-        self.db = np.sum(dy, axis=0, keepdims=True)
-
         if self.dropout:
             dy = self.dropout_backward(dy)
+
+        if self.batch_norm:
+            dy = self.batch_norm_backward(dy)
         
-        # L2 Regularization not equivalent to weight decay (however is understood to be for SGD) 
-        if reg_term:
-            self.dW = self.x.T @ dy - reg_term * self.W / self.x.shape[0]
+        dW = self.x.T @ dy
+        self.db = np.sum(dy, axis=0, keepdims=True)
+
+        # L2 Regularization:
+        self.dW = dW - self.L2_reg_term * self.W / self.x.shape[0] if self.L2_reg_term else dW
+        # not equivalent to weight decay (however is understood to be for SGD) 
 
         return dy @ self.W.T
 

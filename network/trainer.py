@@ -1,4 +1,3 @@
-import re
 from layer import *
 from loss import *
 from net import *
@@ -127,6 +126,27 @@ def network_batch_norm():
     pl.grid()
     pl.show()
 
+def network_adam():
+    np.random.seed(10)
+    train_set, val_set, test_set = train_val_test()
+
+    mlp = Net(optimizer = Adam(), criterion=CrossEntropyLoss(), L2_reg_term=0, batch_norm=False)
+
+    mlp.add(Linear(128, 1024))
+    mlp.add(ReLU())
+    mlp.add(Linear(1024, 64))
+    mlp.add(ReLU())
+    mlp.add(Linear(64, 10))
+
+    CE = mlp.train_network(train_set=train_set, valid_set=val_set, epochs=200, batch_size=500)
+
+    print(mlp.validate_batch(test_set[0], test_set[1], batch_size=500))
+
+    pl.figure(figsize=(15,4))
+    pl.plot(CE)
+    pl.grid()
+    pl.show()
+
 def network1():
     """
     Testing normal network
@@ -134,15 +154,17 @@ def network1():
     np.random.seed(10)
     train_set, val_set, test_set = train_val_test()
 
-    mlp = Net(optimizer = SGD(learning_rate=0.01, momentum=0.5), criterion=CrossEntropyLoss(), reg_term=0.01)
+    mlp = Net(optimizer = SGD(learning_rate=0.04, momentum=0.5), criterion=CrossEntropyLoss(), L2_reg_term=0.004, batch_norm=True)
 
-    mlp.add(Linear(128, 1024, dropout=0.2))
+    mlp.add(Linear(128, 1024, dropout=0.3))
     mlp.add(ReLU())
     mlp.add(Linear(1024, 64, dropout=0.2))
     mlp.add(ReLU())
-    mlp.add(Linear(64, 10, dropout=0.2))
+    mlp.add(Linear(64, 16, dropout=0.1))
+    mlp.add(ReLU())
+    mlp.add(Linear(16, 10))
 
-    CE = mlp.train_network(train_set=train_set, valid_set=val_set, epochs=100, batch_size=500)
+    CE = mlp.train_network(train_set=train_set, valid_set=val_set, epochs=500, batch_size=500)
 
     print(mlp.validate_batch(test_set[0], test_set[1], batch_size=500))
 
@@ -152,7 +174,7 @@ def network1():
     pl.show()
 
 def main():
-    network1()
+    network_adam()
 
 if __name__ == "__main__":
     main()

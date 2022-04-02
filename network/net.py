@@ -1,6 +1,6 @@
 from loss import CrossEntropyLoss
 from layer import Linear
-from optim import SGD
+from optim import SGD, Adam
 from layer import Layer
 import numpy as np
 
@@ -19,11 +19,11 @@ class Net:
             Batch Norm (chosen to toggle for whole network for convenience)
 
     """
-    def __init__(self, optimizer=SGD, criterion=CrossEntropyLoss, batch_norm=False, alpha=0.9, reg_term=0.1):
-        self.layers, self.size = [], 0
+    def __init__(self, optimizer=SGD, criterion=CrossEntropyLoss, batch_norm=False, alpha=0.9, L2_reg_term=0):
+        self.layers, self.size, self.linear = [], 0, 0
         self.optimizer, self.criterion = optimizer, criterion
         self.batch_norm, self.alpha = batch_norm, alpha  # alpha only used if batch norm is set
-        self.reg_term = reg_term  # dropout percentage and L2 regularization term
+        self.L2_reg_term = L2_reg_term  # dropout percentage and L2 regularization term
 
     def add(self, layer):
         """
@@ -32,6 +32,11 @@ class Net:
         if isinstance(layer, Linear): 
             if self.batch_norm:
                 layer.batch_norm, layer.alpha = True, self.alpha
+            if self.L2_reg_term:
+                layer.L2_reg_term = self.L2_reg_term
+            if isinstance(self.optimizer, Adam):
+                self.linear += 1
+                self.optimizer.add_to_dict(layer.indim, layer.outdim, self.linear)
             
         self.layers += [layer]
         self.size += 1
@@ -41,7 +46,10 @@ class Net:
         Forward pass
         """
         for layer in self.layers:
-            x = layer.forward(x, predict) if isinstance(layer, Linear) else layer.forward(x)
+            if isinstance(layer, Linear): 
+                layer.predict = predict     # toggled during validation / testing
+                
+            x = layer.forward(x)
         return x
 
     def backward(self, dy):
@@ -49,13 +57,13 @@ class Net:
         Backward pass
         """
         for layer in self.layers[::-1]:
-            dy = layer.backward(dy, self.reg_term) if isinstance(layer, Linear) else layer.backward(dy)
+            dy = layer.backward(dy)
 
-    def update(self):
+    def update(self, t):
         """
         Uses optimizer to update weights and biases in each layer based on saved dW and db
         """
-        self = self.optimizer.step(self)
+        self = self.optimizer.step(self, t) if isinstance(self.optimizer, Adam) else self.optimizer.step(self)
 
     def reset_gradients(self):
         """
@@ -68,14 +76,14 @@ class Net:
     def __call__(self, x):
         return self.forward(x)
 
-    def train_batch(self, x, label):
+    def train_batch(self, x, label, time_step):
 
         self.reset_gradients()
         out = self.forward(x)
         loss, _ = self.criterion(out, label)        
         self.backward(self.criterion.backward())
 
-        self.update() # SGD step
+        self.update(time_step) # Optizer step: time_step only used in Adam
 
         return loss
 
@@ -117,16 +125,16 @@ class Net:
         for ep in range(epochs):
 
             order = np.random.permutation(N)
-            train_loss = 0
-
+            train_loss, time_step = 0, 0
+            
             for START in range(0, N, batch_size):
 
                 END = min(START + batch_size, N)
                 i = order[START : END] 
                 
-                x, label = train_x[i], train_y[i]
+                x, label, time_step = train_x[i], train_y[i], time_step + 1
 
-                train_loss += self.train_batch(x, label)
+                train_loss += self.train_batch(x, label, time_step)
             
             train_loss = train_loss / (N // batch_size)
 
