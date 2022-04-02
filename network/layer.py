@@ -1,3 +1,4 @@
+from matplotlib.pyplot import axis
 import numpy as np
 
 def xavier(size, gain=1):
@@ -60,7 +61,6 @@ class Linear(Layer):
 
         self.dW = self.x.T @ dy
         self.db = np.sum(dy, axis=0, keepdims=True)
-        
         return dy @ self.W.T
 
     def update(self, lr):

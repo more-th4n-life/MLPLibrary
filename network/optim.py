@@ -14,9 +14,7 @@ class SGD:
         """
         Update weights and biases in each layer wrt learned dW and db AND learning rate (+ weight decay) term
         """
-        layers = [l for l in network.layers if isinstance(l, Layer)]
-
-        for layer in layers:
-
+        for layer in [l for l in network.layers if isinstance(l, Layer)]:
+       
             layer.W += self.lr * (-layer.dW - self.wd * layer.W) 
             layer.b += -self.lr * layer.db 

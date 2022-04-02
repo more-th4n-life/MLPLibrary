@@ -39,7 +39,6 @@ class Net:
         """
         for layer in self.layers[::-1]:
             dy = layer.backward(dy)
-        return dy
 
     def update(self):
         """
@@ -69,7 +68,7 @@ class Net:
 
         return loss
 
-    def validate_batch(self, valid_x, valid_y, batch_size):
+    def validate_batch(self, valid_x, valid_y, batch_size=20):
         N = valid_x.shape[0]
 
         losses = 0
@@ -77,6 +76,7 @@ class Net:
 
         for START in range(0, N, batch_size):
             END = min(START + batch_size, N)
+            
             x, label = valid_x[START : END], valid_y[START : END]
             
             out = self.forward(x)
@@ -88,7 +88,7 @@ class Net:
 
         return losses/N, correct/N
 
-    def train_network(self, train_set, valid_set, epochs, batch_size=1):
+    def train_network(self, train_set, valid_set, epochs, batch_size=20):
         """
         Mini batch training.. separated from train that uses a dataloader which can also load batches, but
         I think that it could be overkill and also doesn't shuffle / take random samples like it should
@@ -109,7 +109,7 @@ class Net:
             for START in range(0, N, batch_size):
 
                 END = min(START + batch_size, N)
-                i = order[START : END]
+                i = order[START : END] 
                 
                 x, label = train_x[i], train_y[i]
 

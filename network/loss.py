@@ -24,7 +24,7 @@ class CrossEntropyLoss(Loss):
         Returns probabilities for each class
         """
         clas = np.exp(x - np.max(x, axis=1, keepdims=True)) 
-        return np.divide(clas, np.sum(clas, axis=1, keepdims=True))
+        return clas / np.sum(clas, axis=1, keepdims=True)
 
     def forward(self, x, label):
         """
