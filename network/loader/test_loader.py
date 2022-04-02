@@ -7,9 +7,9 @@ from loader.sampler import SubsetRandSampler
 
 def train_val_test():
     data = get_data()
-    train_data = (data[0])
+    train_data = standardize(data[0])
     train_label = one_hot(data[1], 10)
-    test_data = (data[2])
+    test_data = standardize(data[2])
     test_label = one_hot(data[3], 10)
 
     val_size = 0.2
