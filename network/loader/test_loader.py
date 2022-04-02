@@ -7,9 +7,9 @@ from loader.sampler import SubsetRandSampler
 
 def train_val_test():
     data = get_data()
-    train_data = standardize(data[0])
+    train_data = (data[0])
     train_label = one_hot(data[1], 10)
-    test_data = standardize(data[2])
+    test_data = (data[2])
     test_label = one_hot(data[3], 10)
 
     val_size = 0.2
@@ -70,9 +70,9 @@ def example_loaders():
     #train_sampler = SubsetRandSampler(train_idx)
     #valid_sampler = SubsetRandSampler(valid_idx)
 
-    train_loader = DataLoader(data[spl:], n_workers=1, batch_size=64)
-    valid_loader = DataLoader(data[:spl], n_workers=1, batch_size=64)
-    test_loader = DataLoader(test, n_workers=1, batch_size=64)
+    train_loader = DataLoader(data[spl:], n_workers=1, batch_size=20)
+    valid_loader = DataLoader(data[:spl], n_workers=1, batch_size=20)
+    test_loader = DataLoader(test, n_workers=1, batch_size=20)
 
     return train_loader, valid_loader, test_loader
 

@@ -47,15 +47,21 @@ class Linear(Layer):
         Apply wx + b linear transformations
         """
         self.x = x
-        return np.dot(x, self.W) + self.b
+        return x @ self.W + self.b
 
     def backward(self, dy):
         """
         Calculate gradient wrt dy for update step
         """
-        self.dW = np.dot(self.x.T, dy)
+        #self.dcost = dy
+        #self.dz = self.h
+
+        #self.dcostw = np.dot((self.dz.T, self.dcost))
+        #self.dcostb = self.dcost
+
+        self.dW = self.x.T @ dy
         self.db = np.sum(dy, axis=0, keepdims=True)
-        return np.dot(dy, self.W.T)
+        return dy @ self.W.T
 
     def update(self, lr):
         """
@@ -72,16 +78,16 @@ class Linear(Layer):
         self.dW = np.zeros_like(self.dW)
         self.db = np.zeros_like(self.db)
 
-class Activation():
+class Activation:
     """
     Abstract class for activations 
     """
     def __init__(self):
         pass
-    def forward(self):
-        pass
-    def backward(self):
-        pass
+    def forward(self, x):
+        return x
+    def backward(self, dy):
+        return dy
 
 class ReLU(Activation):
     def __init__(self):
@@ -122,6 +128,24 @@ class LeakyReLU(Activation):
         If > 0 ret 1 else return leaky amount
         """
         return dy * (self.x > 0) + (self.x <= 0) * dy * self.leak
+
+class Softmax(Activation):
+    def __init__(self):
+        pass
+
+    def forward(self, x):
+        """
+        Returns probabilities for each class
+        """
+        clas = np.exp(x - np.max(x, axis=1, keepdims=True)) 
+        return clas / np.sum(clas, axis=1, keepdims=True)
+
+    def backward(self, dy):
+        z = np.exp(dy)
+        s = np.sum(z, axis = 1, keepdims=True)
+        a = z / s
+        da =  a * (1 - s)
+        return da
 
 if __name__ == "__main__":
 

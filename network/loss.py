@@ -17,14 +17,14 @@ class CrossEntropyLoss(Loss):
     """
     def __init__(self):
         self.prob, self.label, self.logit = None, None, None
-        self.epsilon = 1e-10
+        self.epsilon = 1e-09
 
     def softmax(self, x):
         """
         Returns probabilities for each class
         """
         clas = np.exp(x - np.max(x, axis=1, keepdims=True)) 
-        return clas / np.sum(clas, axis=1, keepdims=True)
+        return np.divide(clas, np.sum(clas, axis=1, keepdims=True))
 
     def forward(self, x, label):
         """
@@ -33,17 +33,18 @@ class CrossEntropyLoss(Loss):
         self.prob, self.label = self.softmax(x), label
         self.logit = -np.log(self.prob + self.epsilon)
         
-        return np.sum(self.logit * label) / self.prob.shape[0] / self.label.shape[1]  # prevent log(0)
+        return np.sum(self.logit * label) / self.prob.shape[0], self.prob  # prevent log(0)
     
     def backward(self):
         """
         Returns difference between softmax probs and ground truth for update
         """
-        return (self.prob - self.label) / self.prob.shape[0]
-
+        return (self.prob - self.label) / self.prob.shape[1]
+       
 
     def __call__(self, x, label):
         return self.forward(x, label)
+
 
 if __name__ == "__main__":
     from loader.process import one_hot

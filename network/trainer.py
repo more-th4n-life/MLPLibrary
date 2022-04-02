@@ -73,20 +73,26 @@ def network1():
     """
     Testing normal network
     """
-    train_loader, valid_loader, test_loader = example_loaders()
+    #train_loader, valid_loader, test_loader = example_loaders()
+    train_set, val_set, test_set = train_val_test()
 
-    mlp = Net(optimizer = SGD(0.1, 0.001), criterion=CrossEntropyLoss())
+    mlp = Net(optimizer = SGD(0.07, 0.00001), criterion=CrossEntropyLoss())
 
-    mlp.add(Linear(128, 64))
-    mlp.add(ReLU())
+    mlp.add(Linear(128, 96))
+    mlp.add(LeakyReLU())
+    mlp.add(Linear(96, 64))
+    mlp.add(LeakyReLU())
     mlp.add(Linear(64, 32))
-    mlp.add(ReLU())
+    mlp.add(LeakyReLU())
     mlp.add(Linear(32, 16))
-    mlp.add(ReLU())
+    mlp.add(LeakyReLU())
     mlp.add(Linear(16, 10))
 
-    mlp.train(train_loader, valid_loader, 11)
-    mlp.test(test_loader)
+    #mlp.train(train_loader, valid_loader, 11)
+    mlp.train_network(train_set=train_set, valid_set=val_set, epochs=20, batch_size=30)
+    #mlp.test(test_loader)
+
+    print(mlp.validate_batch(test_set[0], test_set[1], batch_size=30))
 
 def main():
     network1()

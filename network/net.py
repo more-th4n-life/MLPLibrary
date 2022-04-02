@@ -58,7 +58,37 @@ class Net:
     def __call__(self, x):
         return self.forward(x)
 
-    def train_mb(self, train_set, valid_set, epochs, batch_size=1):
+    def train_batch(self, x, label):
+
+        self.reset_gradients()
+        out = self.forward(x)
+        loss, _ = self.criterion(out, label)        
+        self.backward(self.criterion.backward())
+
+        self.update() # SGD step
+
+        return loss
+
+    def validate_batch(self, valid_x, valid_y, batch_size):
+        N = valid_x.shape[0]
+
+        losses = 0
+        correct = 0
+
+        for START in range(0, N, batch_size):
+            END = min(START + batch_size, N)
+            x, label = valid_x[START : END], valid_y[START : END]
+            
+            out = self.forward(x)
+            loss, prob = self.criterion(out, label)
+            losses += loss * (END - START)
+            pred, target = np.argmax(prob, axis=1), np.argmax(label, axis=1)
+
+            correct += np.sum(pred==target)
+
+        return losses/N, correct/N
+
+    def train_network(self, train_set, valid_set, epochs, batch_size=1):
         """
         Mini batch training.. separated from train that uses a dataloader which can also load batches, but
         I think that it could be overkill and also doesn't shuffle / take random samples like it should
@@ -66,49 +96,33 @@ class Net:
         This is not main train yet because not working well for low sizes, e.g. batch_size=1 or 2
         however, just noticed it might be related to the log function in ce loss
         """
-        mini_batch = batch_size > 1
-        perm = lambda x: np.random.permutation(x)
-
         train_x, train_y = train_set
         valid_x, valid_y = valid_set
 
+        N = train_x.shape[0]
+
         for ep in range(epochs):
-            tr_loss, tr_accu = [], []
-            va_loss, va_accu = [], []
 
-            for i in range(0, train_x.shape[0], batch_size):
+            order = np.random.permutation(N)
+            train_loss = 0
 
-                id = perm(train_x.shape[0])[i:i+batch_size] if mini_batch else [i]
-                x, label = train_x[id], train_y[id]
+            for START in range(0, N, batch_size):
 
-                self.reset_gradients()
-                out = self.forward(x)
-                loss = self.criterion(out, label)
+                END = min(START + batch_size, N)
+                i = order[START : END]
                 
-                pred, target = np.argmax(out, axis=1), np.argmax(label, axis=1)
-                
-                self.backward(self.criterion.backward())
-                self.update() # SGD step
+                x, label = train_x[i], train_y[i]
 
-                tr_loss.append(loss)
-                tr_accu.append(np.sum(pred==target) / x.shape[0])
+                train_loss += self.train_batch(x, label)
+            
+            train_loss = train_loss / (N // batch_size)
 
-            for i in range(0, valid_x.shape[0], batch_size):
+            val_loss, val_acc = self.validate_batch(valid_x, valid_y, batch_size)
 
-                id = perm(valid_x.shape[0])[i:i+batch_size] if mini_batch else [i]                
-                x, label = valid_x[id], valid_y[id]
+            print(f"Epoch: {ep+1} \t Training Loss:{train_loss:.6f}")
+            print(f"Epoch: {ep+1} \t Validation Loss:{val_loss:.6f} \t Validation Accuracy: {val_acc:.6f}")
 
-                out = self.forward(x)
-
-                loss = self.criterion(out, label)
-                pred, target = np.argmax(out, axis=1), np.argmax(label, axis=1)
-
-                va_loss.append(loss)
-                va_accu.append(np.sum(pred==target) / x.shape[0])
-
-            print(f"Epoch: {ep+1} \t Training Loss:{np.mean(tr_loss):.6f} \t Training Accuracy: {np.mean(tr_accu):.6f}")
-            print(f"Epoch: {ep+1} \t Validate Loss:{np.mean(va_loss):.6f} \t Validate Accuracy: {np.mean(va_accu):.6f}")
-
+    
     def train(self, train_loader, valid_loader, epochs):
         """
         A training function, load in train / validate data loaders
@@ -123,8 +137,9 @@ class Net:
                 self.reset_gradients()
     
                 out = self.forward(x)
-                loss = self.criterion(out, label)
-                pred, target = np.argmax(out, axis=1), np.argmax(label, axis=1)
+                loss, pred = self.criterion(out, label)
+
+                pred, target = np.argmax(pred, axis=1), np.argmax(label, axis=1)
                 
                 self.backward(self.criterion.backward())
                 self.update() # SGD step
@@ -136,8 +151,8 @@ class Net:
 
                 out = self.forward(x)
 
-                loss = self.criterion(out, label)
-                pred, target = np.argmax(out, axis=1), np.argmax(label, axis=1)
+                loss, pred = self.criterion(out, label)
+                pred, target = np.argmax(pred, axis=1), np.argmax(label, axis=1)
 
                 va_loss.append(loss)
                 va_accu.append(np.sum(pred==target) / x.shape[0])
@@ -145,6 +160,7 @@ class Net:
             print(f"Epoch: {ep+1} \t Training Loss:{np.mean(tr_loss):.6f} \t Training Accuracy: {np.mean(tr_accu):.6f}")
             print(f"Epoch: {ep+1} \t Validate Loss:{np.mean(va_loss):.6f} \t Validate Accuracy: {np.mean(va_accu):.6f}")
 
+    
     def test2(self, test_set):
         """
         Still being fixed, to work with train_mb 
@@ -184,6 +200,7 @@ class Net:
            
             print(f'Test Accuracy of\t{i}: {correct[i] / size[i] * 100:.2f}% ({np.sum(correct[i])}/{np.sum(size[i])})')
 
+    
     def test(self, test_loader):
         """
         Test function, loads in test data loader 
@@ -197,11 +214,11 @@ class Net:
 
             out = self.forward(x)
 
-            loss = self.criterion(out, label)
+            loss, pred = self.criterion(out, label)
 
             test_loss.append(loss)
 
-            pred, target = np.argmax(out, axis=1), np.argmax(label, axis=1)
+            pred, target = np.argmax(pred, axis=1), np.argmax(label, axis=1)
             matches = np.squeeze(pred==target)
 
             for i in range(target.shape[0]):
