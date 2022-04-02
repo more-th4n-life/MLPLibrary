@@ -100,6 +100,7 @@ class Net:
         valid_x, valid_y = valid_set
 
         N = train_x.shape[0]
+        loss_graph = np.zeros(epochs)
 
         for ep in range(epochs):
 
@@ -123,6 +124,9 @@ class Net:
                 print(f"Epoch: {ep} \t Training Loss:{train_loss:.6f}")
                 print(f"Epoch: {ep} \t Validation Loss:{val_loss:.6f} \t Validation Accuracy: {val_acc:.6f}")
 
+            loss_graph[ep] = train_loss
+
+        return loss_graph
     
     def train(self, train_loader, valid_loader, epochs):
         """

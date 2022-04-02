@@ -5,6 +5,8 @@ from optim import *
 from loader.data_loader import *
 from loader.test_loader import *
 
+import matplotlib.pyplot as pl
+
 def network_mb():
     """
     Testing train_mb which doesn't use data and supports mini batch
@@ -77,7 +79,7 @@ def network1():
 
     train_set, val_set, test_set = train_val_test()
 
-    mlp = Net(optimizer = SGD(0.04, 0.004), criterion=CrossEntropyLoss())
+    mlp = Net(optimizer = SGD(learning_rate=0.04, weight_decay=0, momentum=0.5), criterion=CrossEntropyLoss())
 
     mlp.add(Linear(128, 1024))
     mlp.add(ReLU())
@@ -86,10 +88,15 @@ def network1():
     mlp.add(Linear(64, 10))
 
     #mlp.train(train_loader, valid_loader, 11)
-    mlp.train_network(train_set=train_set, valid_set=val_set, epochs=100, batch_size=500)
+    CE = mlp.train_network(train_set=train_set, valid_set=val_set, epochs=500, batch_size=500)
     #mlp.test(test_loader)
 
     print(mlp.validate_batch(test_set[0], test_set[1], batch_size=500))
+
+    pl.figure(figsize=(15,4))
+    pl.plot(CE)
+    pl.grid()
+    pl.show()
 
 def main():
     network1()
