@@ -77,21 +77,19 @@ def network1():
 
     train_set, val_set, test_set = train_val_test()
 
-    mlp = Net(optimizer = SGD(0.01, 0.00001), criterion=CrossEntropyLoss())
+    mlp = Net(optimizer = SGD(0.04, 0.004), criterion=CrossEntropyLoss())
 
-    mlp.add(Linear(128, 64))
+    mlp.add(Linear(128, 1024))
     mlp.add(ReLU())
-    mlp.add(Linear(64, 32))
+    mlp.add(Linear(1024, 64))
     mlp.add(ReLU())
-    mlp.add(Linear(32, 16))
-    mlp.add(ReLU())
-    mlp.add(Linear(16, 10))
+    mlp.add(Linear(64, 10))
 
     #mlp.train(train_loader, valid_loader, 11)
-    mlp.train_network(train_set=train_set, valid_set=val_set, epochs=10, batch_size=10)
+    mlp.train_network(train_set=train_set, valid_set=val_set, epochs=100, batch_size=500)
     #mlp.test(test_loader)
 
-    print(mlp.validate_batch(test_set[0], test_set[1], batch_size=160))
+    print(mlp.validate_batch(test_set[0], test_set[1], batch_size=500))
 
 def main():
     network1()

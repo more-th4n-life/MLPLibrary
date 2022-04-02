@@ -42,6 +42,9 @@ class Linear(Layer):
         self.dW = np.zeros((indim, outdim))
         self.db = np.zeros((1, outdim))
 
+        self.diffW = np.zeros((indim, outdim))
+        self.diffb = np.zeros((1, outdim))
+
     def forward(self, x):
         """
         Apply wx + b linear transformations

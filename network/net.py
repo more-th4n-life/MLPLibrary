@@ -119,8 +119,9 @@ class Net:
 
             val_loss, val_acc = self.validate_batch(valid_x, valid_y, batch_size)
 
-            print(f"Epoch: {ep+1} \t Training Loss:{train_loss:.6f}")
-            print(f"Epoch: {ep+1} \t Validation Loss:{val_loss:.6f} \t Validation Accuracy: {val_acc:.6f}")
+            if ep % 10 == 0:
+                print(f"Epoch: {ep} \t Training Loss:{train_loss:.6f}")
+                print(f"Epoch: {ep} \t Validation Loss:{val_loss:.6f} \t Validation Accuracy: {val_acc:.6f}")
 
     
     def train(self, train_loader, valid_loader, epochs):
