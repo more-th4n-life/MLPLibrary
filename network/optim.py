@@ -1,6 +1,7 @@
 import numpy as np
 from layer import Linear
 
+
 class SGD:
     """
     Stochastic Gradient Descent: Also implements weight decay (can be removed by setting to zero)

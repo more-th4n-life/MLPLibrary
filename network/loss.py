@@ -11,7 +11,7 @@ class Loss():
     def backward(self):
         pass
 
-class CrossEntropyLoss(Loss):
+class CrossEntropyLoss:
     """
     Calc softmax then negative log-likelihood loss
     """

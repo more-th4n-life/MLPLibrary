@@ -1,4 +1,3 @@
-from black import Line
 from loss import CrossEntropyLoss
 from layer import Linear, Layer
 from activ import ReLU
@@ -21,7 +20,7 @@ class Net:
             Batch Norm (chosen to toggle for whole network for convenience)
 
     """
-    def __init__(self, optimizer=SGD, criterion=CrossEntropyLoss, batch_norm=False, alpha=0.9, L2_reg_term=0):
+    def __init__(self, optimizer=SGD(), criterion=CrossEntropyLoss(), batch_norm=False, alpha=0.9, L2_reg_term=0):
         self.layers, self.size, self.linear = [], 0, 0
         self.optimizer, self.criterion = optimizer, criterion
         self.batch_norm, self.alpha = batch_norm, alpha  # alpha only used if batch norm is set
@@ -32,7 +31,7 @@ class Net:
         if self.model_name:
             return self.model_name
 
-        model = repr(self.optimizer) + '' + repr(self.criterion) + ''
+        model = repr(self.optimizer) + repr(self.criterion)
         model += f"{'L2' if self.L2_reg_term else ''}"
         model += f"{'BN' if self.batch_norm is True else ''}"
 
@@ -317,15 +316,16 @@ if __name__ == "__main__":
 
     assert repr(model1) == repr(model2)
 
-    model3 = Net(optimizer=SGD(weight_decay=0.01, momentum=0.5), criterion=CrossEntropyLoss)
+    model3 = Net(optimizer=SGD(weight_decay=0.01, momentum=0.5), criterion=CrossEntropyLoss())
     model3.add(Linear(128, 1024))
     model3.add(ReLU())
     model3.add(Linear(1024, 64))
     model3.add(ReLU())
     model3.add(Linear(64, 10))
 
-    assert repr(model3) == "SGD(wd+mm)<class 'loss.CrossEntropyLoss'>[1024]ReLU[64]ReLU[10]"
+    assert repr(model3) == "SGD(wd+mm)CELoss[1024]ReLU[64]ReLU[10]"
+
     model3.set_name("SGD_mm_1024_64_10_ReLU")
-    
+
     model3.save_model()
     assert repr(model3) == repr(Net.load_model("network/model/SGD_mm_1024_64_10_ReLU"))
