@@ -2,8 +2,14 @@ from loss import CrossEntropyLoss
 from layer import Linear, Layer
 from activ import ReLU
 from optim import SGD, Adam
+
 import numpy as np
 import os, pickle
+from tqdm import tqdm 
+from functools import partial 
+from time import time
+
+tqdm = partial(tqdm, position = 0, leave = True)
 
 class Net:
     """
@@ -26,6 +32,7 @@ class Net:
         self.batch_norm, self.alpha = batch_norm, alpha  # alpha only used if batch norm is set
         self.L2_reg_term = L2_reg_term  # dropout percentage and L2 regularization term
         self.model_name = None  # used to identify model for saving / loading
+
 
     def __repr__(self):
         if self.model_name:
@@ -98,12 +105,13 @@ class Net:
 
         self.reset_gradients()
         out = self.forward(x)
-        loss, _ = self.criterion(out, label)        
+        loss, prob = self.criterion(out, label)        
         self.backward(self.criterion.backward())
-
         self.update(time_step) # Optizer step: time_step only used in Adam
+        pred, target = np.argmax(prob, axis=1), np.argmax(label, axis=1)
+        correct = np.sum(pred==target) / x.shape[0]
 
-        return loss
+        return loss, correct
 
     def validate_batch(self, valid_x, valid_y, batch_size=20):
         N = valid_x.shape[0]
@@ -126,6 +134,101 @@ class Net:
 
         return losses/N, correct/N
 
+    def _display(self, best_model):
+        return f"""
+                Best model found @ Epoch {best_model['ep']}
+                --------------------------------------------
+                Training Loss: {best_model['t_loss']:.6f}
+                Validation Loss: {best_model['v_loss']:.6f}
+                --------------------------------------------
+                Training Accuracy: {best_model['t_acc']:.6f}
+                Validation Accuracy: {best_model['v_acc']:.6f}\n"""
+
+    def train_convergence(self, train_set, valid_set, batch_size=20, threshold=0.1, report_interval=10, planned_epochs=1000, last_check=10):
+        train_x, train_y = train_set
+        valid_x, valid_y = valid_set
+
+        best_model = {"ep":0,"t_loss":0,"t_acc":0,"v_loss":0,"v_acc":0}
+
+        t_loss_graph, t_acc_graph = np.zeros(planned_epochs), np.zeros(planned_epochs)
+        v_loss_graph, v_acc_graph = np.zeros(planned_epochs), np.zeros(planned_epochs)
+
+        start_interval, train_start, prev_train_loss = time(), time(), 0
+        N, no_decrease, val_loss, val_loss_min = train_x.shape[0], 0, 0, np.Inf
+
+        show_time = lambda val: f"{int(val//60)} min(s), {np.round(np.mod(val,60), 1)} sec(s)" if val >= 60 else f"{np.round(val,1)} sec(s)"
+
+        for ep in tqdm(range(planned_epochs)):
+            self.ep = ep
+            order = np.random.permutation(N)  # shuffling indices
+            train_loss, train_acc, time_step = 0, 0, 0
+
+            for START in range(0, N, batch_size):
+
+                END = min(START + batch_size, N)
+                i = order[START : END]   # batch indices
+                
+                x, label, time_step = train_x[i], train_y[i], time_step + 1  
+
+                loss, acc = self.train_batch(x, label, time_step)
+                train_loss, train_acc = train_loss + loss, train_acc + acc
+                
+            train_acc = train_acc / (N // batch_size)
+            train_loss = train_loss / (N // batch_size)
+
+            val_loss, val_acc = self.validate_batch(valid_x, valid_y, batch_size)
+
+            if ep % report_interval == 0:
+                elapsed, start_interval = time() - start_interval, time()  # reset start, and update elapsed
+                print(f"\nEpoch: {ep}\tInterval Time: {show_time(elapsed)}\tTraining Loss: {train_loss:.6f}\t\tTraining Accuracy: {train_acc:.6f}")
+                print(f"\t\t\t\t\t\tValidation Loss:{val_loss:.6f}\tValidation Accuracy: {val_acc:.6f}")
+
+            # check if train loss not decreasing enough
+            train_convergence = (prev_train_loss > 0) and (1 - train_loss / prev_train_loss) < (threshold / 100)
+
+            # check if validation loss stops decreasing re last 5 models - more likely to occur first
+            valid_convergence = no_decrease >= last_check and val_loss_min < val_loss and val_loss_min > 0
+
+            if val_loss <= val_loss_min:
+                    val_loss_min, no_decrease = val_loss, 0
+                    best_model = {
+                        "ep":ep, 
+                        "t_loss":train_loss,
+                        "t_acc":train_acc,
+                        "v_loss":val_loss,
+                        "v_acc":val_acc,
+                    }
+                    self.save_model(train=True)
+
+            else: no_decrease += 1
+
+            prev_train_loss = train_loss
+
+            if valid_convergence or train_convergence:
+                if valid_convergence:
+                    print(f"\n\nNo decrease in validation loss during last {last_check} epoch(s).")
+                else:
+                    print(f"\n\nMinimum percent change ({threshold}%) in training loss not exceeded.")
+
+                print(f"\nConvergence criteria achieved.\nTraining completed @ Epoch {ep}.")
+                print(f"Total training time: {show_time(time() - train_start)}\n")
+                print(self._display(best_model))
+                print(f"\nBest model '{self.model_name}' saved in 'network/model/' directory.")
+
+                e = best_model['ep']
+                return t_loss_graph[:e], t_acc_graph[:e], v_acc_graph[:e], v_acc_graph[:e]
+
+            t_loss_graph[ep], t_acc_graph[ep], v_loss_graph[ep], v_acc_graph[ep] = train_loss, train_acc, val_loss, val_acc
+
+        print(f"\n\nMaximum planned number of epoch(s) exhausted.\n\nTraining is complete @ Epoch {ep}.")
+        print(f"Total training time: {show_time(time() - train_start)}")
+        print(self._display(best_model))
+        
+        self.save_model(train=True)
+
+        return t_loss_graph, t_acc_graph, v_acc_graph, v_acc_graph
+
+
     def train_network(self, train_set, valid_set, epochs, batch_size=20):
         """
         Mini batch training.. separated from train that uses a dataloader which can also load batches, but
@@ -140,7 +243,7 @@ class Net:
         N = train_x.shape[0]
         loss_graph = np.zeros(epochs)
 
-        for ep in range(epochs):
+        for ep in tqdm(range(epochs)):
 
             order = np.random.permutation(N)
             train_loss, time_step = 0, 0
@@ -281,17 +384,22 @@ class Net:
             print(f'Test Accuracy of\t{i}: {correct[i] / size[i] * 100:.2f}% ({np.sum(correct[i])}/{np.sum(size[i])})')
 
         
-    def save_model(self):
+    def save_model(self, train=False):
         path = "network/model/"
         try:
             path_name = path + repr(self)
             with open(path_name, "wb") as file:
                 pickle.dump(self, file, protocol = pickle.HIGHEST_PROTOCOL)
+
+            if train: return self
+
             print("\nModel Save Successful!", end='\n\n')
             print(f"Model name: {repr(self)}")
             wd = os.getcwd().replace("\\","/") + '/'
             print(f"Saved in: {wd + path}", end='\n\n')
             print(f"Full path: {wd + path + repr(self)}")
+
+            
         except Exception as e:
             print("Save unsuccessful: ", e)
 

@@ -11,7 +11,7 @@ class Loss():
     def backward(self):
         pass
 
-class CrossEntropyLoss:
+class CrossEntropyLoss(Loss):
     """
     Calc softmax then negative log-likelihood loss
     """
@@ -54,23 +54,10 @@ if __name__ == "__main__":
 
     ce = CrossEntropyLoss()
     x = np.array([[-0.8,  0.5,  0.4, -1.1,  -1.6,  0.2, 1.2, 3.1, 2.0, -0.1]])
-
     label = one_hot(7, 10)
-    #print(x)
-    #print(label)
-
     s = ce.softmax(x)
-    #print(s)
-
     print(ce.forward(x, label)[0])
-    #print(ce.backward())
-
     x = ce.forward(x, label)[0]
-    #print(np.sum(x) / x.shape[1])
-
     print(x.shape[1])
-
-    #print(np.mean(x))
-
     y = ce.backward()
     print(y)
