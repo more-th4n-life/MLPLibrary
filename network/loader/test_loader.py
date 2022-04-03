@@ -5,6 +5,8 @@ from loader.process import standardize, normalize, get_data, one_hot, pca
 import numpy as np
 from loader.sampler import SubsetRandSampler
 
+
+
 def train_val_test():
     data = get_data()
     train_data = standardize(data[0])

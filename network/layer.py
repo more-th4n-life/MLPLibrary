@@ -1,11 +1,5 @@
+from re import S
 import numpy as np
-
-def xavier(size, gain=1):
-    """
-    Helper function for Xavier initialisation
-    """
-    i = gain * np.sqrt(6. / np.sum(size))
-    return np.random.uniform(low = -i, high = i, size = size)
 
 
 class Layer():
@@ -24,7 +18,7 @@ class Layer():
 
 class Linear(Layer):
 
-    def __init__(self, indim, outdim, dropout=0):
+    def __init__(self, indim, outdim, dropout=0, weights="xavier", bias="zero"):
         """
         Layer: Linear y = xw + b
 
@@ -37,10 +31,23 @@ class Linear(Layer):
         self.dropout = dropout
         self.epsilon = 1e-10
         
-        # initialize weights and bias (Xavier init)
-        self.W = xavier((indim, outdim))
-        self.b = xavier((1, outdim))
+        const = lambda size: np.full(size, 0.01)
 
+        # Initialization methods (weights init randomly and bias either small or zero)
+        init = {
+            # Uniform Initialization for Weights
+            'xavier': self.xavier,      # more suitable for weights with tanh activation
+            'kaiming': self.kaiming,     # more suitable for weight with relu activation
+
+            # Constant Initialization for Bias (user also select Xavier or Kaiming)
+            'const': const,            # sometimes 0.01 preferred over 0 with relu activation
+        }
+
+        # randomly init weights based on chosen init method
+        self.W = init[weights]((indim, outdim))
+        self.b = np.zeros((1, outdim)) if bias=="zero" else init[bias]((1, outdim))
+        
+        # gradient of W and b terms
         self.dW = np.zeros((indim, outdim))
         self.db = np.zeros(outdim,)
 
@@ -56,6 +63,20 @@ class Linear(Layer):
 
         # predict toggled for validation / testing
         self.predict = False
+
+    def xavier(self, size, gain=1):
+        """
+        Helper function for Xavier Uniform Initialisation
+        """
+        i = gain * np.sqrt(6. / np.sum(size))
+        return np.random.uniform(low = -i, high = i, size = size)
+
+    def kaiming(self, size, gain=1):
+        """
+        Helper function for Kaiming-He Uniform Initialisation
+        """
+        i = gain * np.sqrt(6. / size[0])
+        return np.random.uniform(low = -i, high = i, size = size)
 
     def batch_norm_forward(self, x):
         """

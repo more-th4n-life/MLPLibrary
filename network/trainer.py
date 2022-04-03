@@ -155,11 +155,11 @@ def network_adam():
 
     mlp = Net(optimizer = Adam(), criterion=CrossEntropyLoss(), L2_reg_term=0, batch_norm=False)
 
-    mlp.add(Linear(128, 1024))
+    mlp.add(Linear(128, 1024, weights="kaiming"))
     mlp.add(ReLU())
-    mlp.add(Linear(1024, 64))
+    mlp.add(Linear(1024, 64, weights="kaiming"))
     mlp.add(ReLU())
-    mlp.add(Linear(64, 10))
+    mlp.add(Linear(64, 10, weights="kaiming"))
 
     CE = mlp.train_network(train_set=train_set, valid_set=val_set, epochs=200, batch_size=500)
 
@@ -197,7 +197,7 @@ def network1():
     pl.show()
 
 def main():
-    network_adam_pca()
+    network_adam()
 
 if __name__ == "__main__":
     main()
