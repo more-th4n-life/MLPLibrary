@@ -64,6 +64,9 @@ class Linear(Layer):
         # predict toggled for validation / testing
         self.predict = False
 
+    def __repr__(self):
+        return f"[{self.outdim}]"
+
     def xavier(self, size, gain=1):
         """
         Helper function for Xavier Uniform Initialisation

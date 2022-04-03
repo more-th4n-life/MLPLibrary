@@ -19,6 +19,9 @@ class ReLU(Activation):
         """
         self.x = None
 
+    def __repr__(self):
+        return "ReLU"
+
     def forward(self, x):
         """
         Returns x if x > 0
@@ -38,6 +41,9 @@ class LeakyReLU(Activation):
         Leaky ReLU
         """
         self.leak = 0.03
+
+    def __repr__(self):
+        return "LeakyReLU"
 
     def forward(self, x):
         """

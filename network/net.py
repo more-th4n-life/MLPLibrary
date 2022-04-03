@@ -1,8 +1,8 @@
 from loss import CrossEntropyLoss
-from layer import Linear
+from layer import Linear, Layer
 from optim import SGD, Adam
-from layer import Layer
 import numpy as np
+import os, pickle
 
 class Net:
     """
@@ -24,6 +24,16 @@ class Net:
         self.optimizer, self.criterion = optimizer, criterion
         self.batch_norm, self.alpha = batch_norm, alpha  # alpha only used if batch norm is set
         self.L2_reg_term = L2_reg_term  # dropout percentage and L2 regularization term
+
+    def __repr__(self):
+        model = repr(self.optimizer) + '' + repr(self.criterion) + ''
+        model += f"{'L2' if self.L2_reg_term else ''}"
+        model += f"{'BN' if self.batch_norm is True else ''}"
+
+        for layer in self.layers:
+            model += repr(layer) 
+
+        return model
 
     def add(self, layer):
         """
@@ -146,6 +156,8 @@ class Net:
 
             loss_graph[ep] = train_loss
 
+        self.save_model()
+
         return loss_graph
     
     def train(self, train_loader, valid_loader, epochs):
@@ -259,3 +271,37 @@ class Net:
         for i in range(10):
            
             print(f'Test Accuracy of\t{i}: {correct[i] / size[i] * 100:.2f}% ({np.sum(correct[i])}/{np.sum(size[i])})')
+
+        
+    def save_model(self):
+        path = "network/model/"
+        try:
+            path_name = path + repr(self)
+            with open(path_name, "wb") as file:
+                pickle.dump(self, file, protocol = pickle.HIGHEST_PROTOCOL)
+            print("\nModel Save Successful!", end='\n\n')
+            print(f"Model name: {repr(self)}")
+            wd = os.getcwd().replace("\\","/") + '/'
+            print(f"Saved in: {wd + path}", end='\n\n')
+            print(f"Full path: {wd + path + repr(self)}")
+        except Exception as e:
+            print("Save unsuccessful: ", e)
+
+    
+    @staticmethod
+    def load_model(path):
+        try:
+            with open(path, "rb") as file:
+                return pickle.load(file)
+        except Exception as e:
+            print("Load unsuccessful: ", e)
+
+
+if __name__ == "__main__":
+
+    model = Net.load_model("network/model/AdamCELoss[1024]LeakyReLU[64]LeakyReLU[32]LeakyReLU[10]")
+    assert repr(model) == "AdamCELoss[1024]LeakyReLU[64]LeakyReLU[32]LeakyReLU[10]"
+
+    # will only work for my pc obviously
+    model = Net.load_model("C:/Users/imgap/github/MLPLibrary/network/model/AdamCELoss[1024]LeakyReLU[64]LeakyReLU[32]LeakyReLU[10]")
+    assert repr(model) == "AdamCELoss[1024]LeakyReLU[64]LeakyReLU[32]LeakyReLU[10]"

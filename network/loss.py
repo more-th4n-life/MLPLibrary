@@ -19,6 +19,9 @@ class CrossEntropyLoss(Loss):
         self.prob, self.label, self.logit = None, None, None
         self.epsilon = 1e-09
 
+    def __repr__(self):
+        return "CELoss"
+
     def softmax(self, x):
         """
         Returns probabilities for each class

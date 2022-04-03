@@ -9,6 +9,15 @@ class SGD:
     """
     def __init__(self, learning_rate=0.04, weight_decay = 0, momentum = 0.5):
         self.lr, self.wd, self.momentum = learning_rate, weight_decay, momentum
+
+    def __repr__(self):
+        if self.wd and self.momentum:
+            return "SGD(wd+mm)"
+        elif self.wd:
+            return "SGD(wd)"
+        elif self.momentum:
+            return "SGD(mm)"
+        return "SGD"
         
     def step(self, network):
         """
@@ -36,6 +45,9 @@ class Adam:
         self.s, self.s_corr = {}, {}
 
         self.epsilon = epsilon
+
+    def __repr__(self):
+        return "Adam"
 
     def add_to_dict(self, indim, outdim, i):
 

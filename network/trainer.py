@@ -153,15 +153,17 @@ def network_adam():
     np.random.seed(10)
     train_set, val_set, test_set = train_val_test()
 
-    mlp = Net(optimizer = Adam(), criterion=CrossEntropyLoss(), L2_reg_term=0, batch_norm=False)
+    mlp = Net(optimizer = Adam(learning_rate=0.001), criterion=CrossEntropyLoss(), L2_reg_term=0, batch_norm=False)
 
-    mlp.add(Linear(128, 1024, weights="kaiming"))
-    mlp.add(ReLU())
-    mlp.add(Linear(1024, 64, weights="kaiming"))
-    mlp.add(ReLU())
-    mlp.add(Linear(64, 10, weights="kaiming"))
+    mlp.add(Linear(128, 1024, weights="xavier", bias="const", dropout=0.3))
+    mlp.add(LeakyReLU())
+    mlp.add(Linear(1024, 64, weights="xavier", bias="const", dropout=0.2))
+    mlp.add(LeakyReLU())
+    mlp.add(Linear(64, 32, weights="xavier", bias="const", dropout=0.2))
+    mlp.add(LeakyReLU())
+    mlp.add(Linear(32, 10, weights="xavier", bias="const"))
 
-    CE = mlp.train_network(train_set=train_set, valid_set=val_set, epochs=200, batch_size=500)
+    CE = mlp.train_network(train_set=train_set, valid_set=val_set, epochs=60, batch_size=500)
 
     print(mlp.validate_batch(test_set[0], test_set[1], batch_size=500))
 
