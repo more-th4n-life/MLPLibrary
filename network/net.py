@@ -1,5 +1,7 @@
+from black import Line
 from loss import CrossEntropyLoss
 from layer import Linear, Layer
+from activ import ReLU
 from optim import SGD, Adam
 import numpy as np
 import os, pickle
@@ -24,8 +26,12 @@ class Net:
         self.optimizer, self.criterion = optimizer, criterion
         self.batch_norm, self.alpha = batch_norm, alpha  # alpha only used if batch norm is set
         self.L2_reg_term = L2_reg_term  # dropout percentage and L2 regularization term
+        self.model_name = None  # used to identify model for saving / loading
 
     def __repr__(self):
+        if self.model_name:
+            return self.model_name
+
         model = repr(self.optimizer) + '' + repr(self.criterion) + ''
         model += f"{'L2' if self.L2_reg_term else ''}"
         model += f"{'BN' if self.batch_norm is True else ''}"
@@ -34,6 +40,9 @@ class Net:
             model += repr(layer) 
 
         return model
+
+    def set_name(self, name):
+        self.model_name = name
 
     def add(self, layer):
         """
@@ -299,9 +308,24 @@ class Net:
 
 if __name__ == "__main__":
 
-    model = Net.load_model("network/model/AdamCELoss[1024]LeakyReLU[64]LeakyReLU[32]LeakyReLU[10]")
-    assert repr(model) == "AdamCELoss[1024]LeakyReLU[64]LeakyReLU[32]LeakyReLU[10]"
+    model1 = Net.load_model("network/model/AdamCELoss[1024]LeakyReLU[64]LeakyReLU[32]LeakyReLU[10]")
+    assert repr(model1) == "AdamCELoss[1024]LeakyReLU[64]LeakyReLU[32]LeakyReLU[10]"
 
     # will only work for my pc obviously
-    model = Net.load_model("C:/Users/imgap/github/MLPLibrary/network/model/AdamCELoss[1024]LeakyReLU[64]LeakyReLU[32]LeakyReLU[10]")
-    assert repr(model) == "AdamCELoss[1024]LeakyReLU[64]LeakyReLU[32]LeakyReLU[10]"
+    model2 = Net.load_model("C:/Users/imgap/github/MLPLibrary/network/model/AdamCELoss[1024]LeakyReLU[64]LeakyReLU[32]LeakyReLU[10]")
+    assert repr(model2) == "AdamCELoss[1024]LeakyReLU[64]LeakyReLU[32]LeakyReLU[10]"
+
+    assert repr(model1) == repr(model2)
+
+    model3 = Net(optimizer=SGD(weight_decay=0.01, momentum=0.5), criterion=CrossEntropyLoss)
+    model3.add(Linear(128, 1024))
+    model3.add(ReLU())
+    model3.add(Linear(1024, 64))
+    model3.add(ReLU())
+    model3.add(Linear(64, 10))
+
+    assert repr(model3) == "SGD(wd+mm)<class 'loss.CrossEntropyLoss'>[1024]ReLU[64]ReLU[10]"
+    model3.set_name("SGD_mm_1024_64_10_ReLU")
+    
+    model3.save_model()
+    assert repr(model3) == repr(Net.load_model("network/model/SGD_mm_1024_64_10_ReLU"))
