@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class Activation:
     """
     Abstract class for activations 

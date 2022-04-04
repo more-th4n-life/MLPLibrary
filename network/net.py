@@ -299,7 +299,7 @@ class Net:
     #  TESTING FUNCTIONS                   #
     #                                      #                      
     ########################################
-    
+
     def _predict(self, x):
         """
         Forward pass on batch x
