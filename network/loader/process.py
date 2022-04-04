@@ -2,6 +2,24 @@ import numpy as np
 from numpy import min, max, mean, std, load, array, eye
 
 
+def train_test_split(data, label, ratio=0.2, shuffle=True):
+
+    if shuffle:
+        rand = np.random.permutation(data.shape[0])
+
+    split = int(np.floor(ratio * data.shape[0]))
+
+    # a ratio=0.2 means 20% test 80% training data
+
+    train_data = data[rand[split:]] if shuffle else data[split:]
+    train_label = label[rand[split:]] if shuffle else label[split:]
+
+    test_data = data[rand[:split]] if shuffle else data[:split]
+    test_label = label[rand[:split]] if shuffle else label[:split]
+    
+    return (train_data, train_label), (test_data, test_label)
+
+
 def normalize(data):
     return (data - min(data)) / (max(data) - min(data))
 
@@ -26,6 +44,9 @@ def pca(data, n_comp=2):
     data_reduced = (eigenvector_subset.T @ data_mean.T).T
 
     return data_reduced     # return reduced n principal components
+
+def identity(data):
+    return data
     
 def get_data():
     ld = lambda fn: load(fn)
