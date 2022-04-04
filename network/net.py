@@ -34,7 +34,6 @@ class Net:
         self.L2_reg_term = L2_reg_term  # dropout percentage and L2 regularization term
         self.model_name = None  # used to identify model for saving / loading
 
-
     def __repr__(self):
         if self.model_name:
             return self.model_name
@@ -73,8 +72,7 @@ class Net:
         """
         for layer in self.layers:
             if isinstance(layer, Linear): 
-                layer.predict = predict     # toggled during validation / testing
-                
+                layer.predict = predict     # toggled during validation / testing    
             x = layer.forward(x)
         return x
 
@@ -101,6 +99,12 @@ class Net:
 
     def __call__(self, x):
         return self.forward(x)
+
+    ##############################################################
+    #                                                            #
+    #  BATCH TRAINING & VALIDATION                               #
+    #                                                            #
+    ##############################################################
 
     def train_batch(self, x, label):
 
@@ -135,26 +139,12 @@ class Net:
 
         return losses/N, correct/N
 
-    def _display(self, best_model):
-        return f"""
-                Best model found @ Epoch {best_model['ep']}
-                --------------------------------------------
-                Training Loss: {best_model['t_loss']:.6f}
-                Validation Loss: {best_model['v_loss']:.6f}
-                --------------------------------------------
-                Training Accuracy: {best_model['t_acc']:.6f}
-                Validation Accuracy: {best_model['v_acc']:.6f}\n"""
-
-    def _train_log(self, ep, train_loss, train_acc, val_loss, val_acc, start_interval):
-        elapsed, start_interval = time() - start_interval, time()  # reset start, and update elapsed
-        print(f"\nEpoch: {ep}\tInterval Time: {show_time(elapsed)}\tTraining Loss: {train_loss:.6f}\t\tTraining Accuracy: {train_acc:.6f}")
-        print(f"\t\t\t\t\t\tValidation Loss:{val_loss:.6f}\tValidation Accuracy: {val_acc:.6f}")
-
-    def _train_finish(self, train_start, best_model):
-        print(f"Total training time: {show_time(time() - train_start)}")
-        print(self._display(best_model))
-        print(f"\nBest model '{self.model_name}' saved in 'network/model/' directory.")
-
+    ##############################################################
+    #                                                            #
+    #  NETWORK TRAINING TILL CONVERGENCE OR N EPOCHS             #
+    #                                                            #
+    ##############################################################
+    
     def train_convergence(self, train_set, valid_set, batch_size=20, threshold=0.01, report_interval=10, planned_epochs=1000, last_check=10):
         train_x, train_y = train_set
         valid_x, valid_y = valid_set
@@ -303,133 +293,89 @@ class Net:
         self.save_model(train=True)
 
         return epochs-1, t_loss_graph, t_acc_graph, v_loss_graph, v_acc_graph
+
+    ########################################
+    #                                      #                      
+    #  TESTING FUNCTIONS                   #
+    #                                      #                      
+    ########################################
     
-    def test2(self, test_set):
+    def _predict(self, x):
         """
-        Still being fixed, to work with train_mb 
+        Forward pass on batch x
         """
-        test_x, test_y = test_set
-            
-        test_loss = []
-        correct = [0] * 10
-        size = [0] * 10
-        accu = []
-
-        for i in range(0, test_x.shape[0]):
-
-            x = test_x[i]
-            label = test_y[i]
-
-            out = self.forward(x)
-
-            loss = self.criterion(out, label)
-
-            test_loss.append(loss)
-
-            pred, target = np.argmax(out, axis=1), np.argmax(label, axis=1)
-            matches = np.squeeze(pred==target)
-
-            for i in range(target.shape[0]):
-                y = target[i]
-                correct[y] += matches[y].item()
-                size[y] += 1
-
-            accu.append(np.sum(pred==target) / x.shape[0])
-        
-        print(f"Test loss: {np.mean(test_loss)}")
-        print(f"Test accu: {np.mean(accu)}")
-
-        for i in range(10):
-           
-            print(f'Test Accuracy of\t{i}: {correct[i] / size[i] * 100:.2f}% ({np.sum(correct[i])}/{np.sum(size[i])})')
-
-    def test(self, test_loader):
-        """
-        Test function, loads in test data loader 
-        """
-        test_loss = []
-        correct = [0] * 10
-        size = [0] * 10
-        accu = []
-
-        for x, label in test_loader:
-
-            out = self.forward(x)
-
-            loss, pred = self.criterion(out, label)
-
-            test_loss.append(loss)
-
-            pred, target = np.argmax(pred, axis=1), np.argmax(label, axis=1)
-            matches = np.squeeze(pred==target)
-
-            for i in range(target.shape[0]):
-                y = target[i]
-                correct[y] += matches[y].item()
-                size[y] += 1
-
-            accu.append(np.sum(pred==target) / x.shape[0])
-        
-        print(f"Test loss: {np.mean(test_loss)}")
-        print(f"Test accu: {np.mean(accu)}")
-
-        for i in range(10):
-           
-            print(f'Test Accuracy of\t{i}: {correct[i] / size[i] * 100:.2f}% ({np.sum(correct[i])}/{np.sum(size[i])})')
-
+        out = self.forward(x, predict=True)
+        return self.criterion(out)
 
     def predict(self, x, n_classes):
 
-        test_size = x.shape[0]
+        ret = np.zeros((x.shape[0], n_classes))
 
-        result = np.zeros((test_size, n_classes))
+        for i in range(x.shape[0]):
+            ret[i] = self._predict(x[i,:])
 
-        for i in np.arange(test_size):
-            forw = np.array(x[i,:])
-            out = self.forward(forw, predict=True)
-            result[i] = self.criterion(out)
+        return ret
 
 
-        return result
-    """
-        test_x, test_y = test_set
-            
-        test_loss = []
-        correct = [0] * 10
-        size = [0] * 10
-        accu = []
+    def test_network(self, test_set, data="test data"):
 
-        for i in range(0, test_x.shape[0]):
+        x, labels = test_set
+        n_classes = labels.shape[1]
 
-            x = test_x[i]
-            label = test_y[i]
+        out = self.predict(x, n_classes)
+        pred, target = np.argmax(out, axis=1), np.argmax(labels, axis=1)
 
-            out = self.forward(x)
+        correct = np.sum(pred==target)
 
-            loss = self.criterion(out, label)
+        match = [0] * n_classes
+        count = [0] * n_classes
+        for p, t in zip(pred, target):
+            if p == t:
+                match[t-1] += 1
+            count[t-1] += 1
 
-            test_loss.append(loss)
-
-            pred, target = np.argmax(out, axis=1), np.argmax(label, axis=1)
-            matches = np.squeeze(pred==target)
-
-            for i in range(target.shape[0]):
-                y = target[i]
-                correct[y] += matches[y].item()
-                size[y] += 1
-
-            accu.append(np.sum(pred==target) / x.shape[0])
-        
-        print(f"Test loss: {np.mean(test_loss)}")
-        print(f"Test accu: {np.mean(accu)}")
-
-        for i in range(10):
-           
-            print(f'Test Accuracy of\t{i}: {correct[i] / size[i] * 100:.2f}% ({np.sum(correct[i])}/{np.sum(size[i])})')
+        print("-------------------------------------------")
+        print(f"Accuracy on {data}: {(correct / pred.shape[0]) * 100:.2f}%")
+        print("Total Count: ", pred.shape[0])
+        print("Total Match: ", correct)
+        print("-------------------------------------------")
+        for i in range(n_classes): 
+            print(f'Test Accuracy of\t{i}: {match[i] / count[i] * 100:.2f}% ({np.sum(match[i])}/{np.sum(count[i])})')
 
     
-    """
-        
+    ############################################################
+    #                                                          #
+    #  TRAINING OUTPUT LOGS HELPERS                            #
+    #                                                          #
+    ############################################################
+
+    def _display(self, best_model):
+        return f"""
+                Best model found @ Epoch {best_model['ep']}
+                --------------------------------------------
+                Training Loss: {best_model['t_loss']:.6f}
+                Validation Loss: {best_model['v_loss']:.6f}
+                --------------------------------------------
+                Training Accuracy: {best_model['t_acc']:.6f}
+                Validation Accuracy: {best_model['v_acc']:.6f}\n"""
+
+    def _train_log(self, ep, train_loss, train_acc, val_loss, val_acc, start_interval):
+        elapsed, start_interval = time() - start_interval, time()  # reset start, and update elapsed
+        print(f"\nEpoch: {ep}\tInterval Time: {show_time(elapsed)}\tTraining Loss: {train_loss:.6f}\t\tTraining Accuracy: {train_acc:.6f}")
+        print(f"\t\t\t\t\t\tValidation Loss:{val_loss:.6f}\tValidation Accuracy: {val_acc:.6f}")
+
+    def _train_finish(self, train_start, best_model):
+        print(f"Total training time: {show_time(time() - train_start)}")
+        print(self._display(best_model))
+        print(f"\nBest model '{self.model_name}' saved in 'network/model/' directory.")
+
+
+    ############################################################
+    #                                                          #
+    #  MODEL SAVING AND LOADING                                #
+    #                                                          #
+    ############################################################
+    
     def save_model(self, train=False):
         path = "network/model/"
         try:
