@@ -84,11 +84,11 @@ class Net:
         for layer in self.layers[::-1]:
             dy = layer.backward(dy)
 
-    def update(self, t):
+    def update(self):
         """
         Uses optimizer to update weights and biases in each layer based on saved dW and db
         """
-        self = self.optimizer.step(self, t) if isinstance(self.optimizer, Adam) else self.optimizer.step(self)
+        self = self.optimizer.step(self) 
 
     def reset_gradients(self):
         """
@@ -101,13 +101,13 @@ class Net:
     def __call__(self, x):
         return self.forward(x)
 
-    def train_batch(self, x, label, time_step):
+    def train_batch(self, x, label):
 
         self.reset_gradients()
         out = self.forward(x)
         loss, prob = self.criterion(out, label)        
         self.backward(self.criterion.backward())
-        self.update(time_step) # Optizer step: time_step only used in Adam
+        self.update()   # Optizer step
         pred, target = np.argmax(prob, axis=1), np.argmax(label, axis=1)
         correct = np.sum(pred==target) / x.shape[0]
 
@@ -144,7 +144,7 @@ class Net:
                 Training Accuracy: {best_model['t_acc']:.6f}
                 Validation Accuracy: {best_model['v_acc']:.6f}\n"""
 
-    def train_convergence(self, train_set, valid_set, batch_size=20, threshold=0.1, report_interval=10, planned_epochs=1000, last_check=10):
+    def train_convergence(self, train_set, valid_set, batch_size=20, threshold=0.01, report_interval=10, planned_epochs=1000, last_check=10):
         train_x, train_y = train_set
         valid_x, valid_y = valid_set
 
@@ -156,21 +156,27 @@ class Net:
         start_interval, train_start, prev_train_loss = time(), time(), 0
         N, no_decrease, val_loss, val_loss_min = train_x.shape[0], 0, 0, np.Inf
 
+        self.optimizer.epochs = planned_epochs
+        self.optimizer.iters = planned_epochs * (N // batch_size)
+
         show_time = lambda val: f"{int(val//60)} min(s), {np.round(np.mod(val,60), 1)} sec(s)" if val >= 60 else f"{np.round(val,1)} sec(s)"
 
+        time_step = 0
         for ep in tqdm(range(planned_epochs)):
-            self.ep = ep
+
+            self.optimizer.epoch = ep
             order = np.random.permutation(N)  # shuffling indices
-            train_loss, train_acc, time_step = 0, 0, 0
+            train_loss, train_acc = 0, 0
 
             for START in range(0, N, batch_size):
 
                 END = min(START + batch_size, N)
                 i = order[START : END]   # batch indices
                 
-                x, label, time_step = train_x[i], train_y[i], time_step + 1  
+                x, label, time_step = train_x[i], train_y[i], time_step + 1
+                self.optimizer.time_step = time_step 
 
-                loss, acc = self.train_batch(x, label, time_step)
+                loss, acc = self.train_batch(x, label)
                 train_loss, train_acc = train_loss + loss, train_acc + acc
                 
             train_acc = train_acc / (N // batch_size)
@@ -183,11 +189,11 @@ class Net:
                 print(f"\nEpoch: {ep}\tInterval Time: {show_time(elapsed)}\tTraining Loss: {train_loss:.6f}\t\tTraining Accuracy: {train_acc:.6f}")
                 print(f"\t\t\t\t\t\tValidation Loss:{val_loss:.6f}\tValidation Accuracy: {val_acc:.6f}")
 
-            # check if train loss not decreasing enough
-            train_convergence = (prev_train_loss > 0) and (1 - train_loss / prev_train_loss) < (threshold / 100)
+                # check if train loss not decreasing enough
+                train_convergence = (prev_train_loss > 0) and (1 - train_loss / prev_train_loss) < (threshold / 100)
 
-            # check if validation loss stops decreasing re last 5 models - more likely to occur first
-            valid_convergence = no_decrease >= last_check and val_loss_min < val_loss and val_loss_min > 0
+                # check if validation loss stops decreasing re last 5 models - more likely to occur first
+                valid_convergence = no_decrease >= last_check and val_loss_min < val_loss and val_loss_min > 0
 
             if val_loss <= val_loss_min:
                     val_loss_min, no_decrease = val_loss, 0
@@ -215,8 +221,8 @@ class Net:
                 print(self._display(best_model))
                 print(f"\nBest model '{self.model_name}' saved in 'network/model/' directory.")
 
-                e = best_model['ep']
-                return t_loss_graph[:e], t_acc_graph[:e], v_acc_graph[:e], v_acc_graph[:e]
+                
+                return best_model['ep'], t_loss_graph[:ep], t_acc_graph[:ep], v_loss_graph[:ep], v_acc_graph[:ep]
 
             t_loss_graph[ep], t_acc_graph[ep], v_loss_graph[ep], v_acc_graph[ep] = train_loss, train_acc, val_loss, val_acc
 
@@ -226,7 +232,7 @@ class Net:
         
         self.save_model(train=True)
 
-        return t_loss_graph, t_acc_graph, v_acc_graph, v_acc_graph
+        return t_loss_graph, t_acc_graph, v_loss_graph, v_acc_graph
 
 
     def train_network(self, train_set, valid_set, epochs, batch_size=20):
@@ -383,6 +389,58 @@ class Net:
            
             print(f'Test Accuracy of\t{i}: {correct[i] / size[i] * 100:.2f}% ({np.sum(correct[i])}/{np.sum(size[i])})')
 
+
+    def predict(self, x, n_classes):
+
+        test_size = x.shape[0]
+
+        result = np.zeros((test_size, n_classes))
+
+        for i in np.arange(test_size):
+            forw = np.array(x[i,:])
+            out = self.forward(forw, predict=True)
+            result[i] = self.criterion(out)
+
+
+        return result
+    """
+        test_x, test_y = test_set
+            
+        test_loss = []
+        correct = [0] * 10
+        size = [0] * 10
+        accu = []
+
+        for i in range(0, test_x.shape[0]):
+
+            x = test_x[i]
+            label = test_y[i]
+
+            out = self.forward(x)
+
+            loss = self.criterion(out, label)
+
+            test_loss.append(loss)
+
+            pred, target = np.argmax(out, axis=1), np.argmax(label, axis=1)
+            matches = np.squeeze(pred==target)
+
+            for i in range(target.shape[0]):
+                y = target[i]
+                correct[y] += matches[y].item()
+                size[y] += 1
+
+            accu.append(np.sum(pred==target) / x.shape[0])
+        
+        print(f"Test loss: {np.mean(test_loss)}")
+        print(f"Test accu: {np.mean(accu)}")
+
+        for i in range(10):
+           
+            print(f'Test Accuracy of\t{i}: {correct[i] / size[i] * 100:.2f}% ({np.sum(correct[i])}/{np.sum(size[i])})')
+
+    
+    """
         
     def save_model(self, train=False):
         path = "network/model/"

@@ -45,8 +45,12 @@ class CrossEntropyLoss(Loss):
         return (self.prob - self.label) / self.prob.shape[0]
        
 
-    def __call__(self, x, label):
-        return self.forward(x, label)
+    def __call__(self, x, label=None):
+        """
+        Since softmax is treated as the last activation layer,
+        criterion CELoss will be used in forward pass during prediction (without labels)
+        """
+        return self.forward(x, label) if isinstance(label, np.ndarray) else self.softmax(x)
 
 
 if __name__ == "__main__":
