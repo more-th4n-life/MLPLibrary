@@ -131,6 +131,25 @@ def plot_results(ep, tl, ta, vl, va):
 
     pl.show()
 
+def network_train():
+    train_set, val_set, test_set = train_val_test()
+
+    mlp = Net(optimizer = Adam(), \
+                criterion=CrossEntropyLoss(), L2_reg_term=0.001, batch_norm=False)
+
+    mlp.add(Linear(128, 1024, weights="xavier", bias="const"))
+    mlp.add(LeakyReLU())
+    mlp.add(Linear(1024, 64, weights="xavier", bias="const"))
+    mlp.add(LeakyReLU())
+    mlp.add(Linear(64, 32, weights="xavier", bias="const"))
+    mlp.add(LeakyReLU())
+    mlp.add(Linear(32, 10, weights="xavier", bias="const"))
+
+    mlp.set_name("test_model_train")
+
+    ep, tl, ta, vl, va = mlp.train_network(train_set=train_set, valid_set=val_set, batch_size=500, epochs=10)
+    plot_results(ep, tl, ta, vl, va)
+
 def network_convergence():
 
     train_set, val_set, test_set = train_val_test()
@@ -149,7 +168,7 @@ def network_convergence():
     mlp.set_name("test_model")
 
     ep, tl, ta, vl, va = mlp.train_convergence(train_set=train_set, valid_set=val_set, batch_size=500, planned_epochs=10000, \
-                                                report_interval=5, last_check=20, threshold=0.001)
+                                                report_interval=5, last_check=10, threshold=0.01)
 
     plot_results(ep, tl, ta, vl, va)
 
@@ -240,7 +259,9 @@ def load_model_predict():
 
 def main():
     network_convergence()
-    load_model_predict()
+    #network_train()
+
+    #load_model_predict()
 
 if __name__ == "__main__":
     main()

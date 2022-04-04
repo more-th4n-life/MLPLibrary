@@ -10,6 +10,7 @@ from functools import partial
 from time import time
 
 tqdm = partial(tqdm, position = 0, leave = True)
+show_time = lambda t: f"{int(t//60)} min(s), {np.round(np.mod(t,60), 1)} sec(s)" if t >= 60 else f"{np.round(t,1)} sec(s)"
 
 class Net:
     """
@@ -144,6 +145,16 @@ class Net:
                 Training Accuracy: {best_model['t_acc']:.6f}
                 Validation Accuracy: {best_model['v_acc']:.6f}\n"""
 
+    def _train_log(self, ep, train_loss, train_acc, val_loss, val_acc, start_interval):
+        elapsed, start_interval = time() - start_interval, time()  # reset start, and update elapsed
+        print(f"\nEpoch: {ep}\tInterval Time: {show_time(elapsed)}\tTraining Loss: {train_loss:.6f}\t\tTraining Accuracy: {train_acc:.6f}")
+        print(f"\t\t\t\t\t\tValidation Loss:{val_loss:.6f}\tValidation Accuracy: {val_acc:.6f}")
+
+    def _train_finish(self, train_start, best_model):
+        print(f"Total training time: {show_time(time() - train_start)}")
+        print(self._display(best_model))
+        print(f"\nBest model '{self.model_name}' saved in 'network/model/' directory.")
+
     def train_convergence(self, train_set, valid_set, batch_size=20, threshold=0.01, report_interval=10, planned_epochs=1000, last_check=10):
         train_x, train_y = train_set
         valid_x, valid_y = valid_set
@@ -158,8 +169,6 @@ class Net:
 
         self.optimizer.epochs = planned_epochs
         self.optimizer.iters = planned_epochs * (N // batch_size)
-
-        show_time = lambda val: f"{int(val//60)} min(s), {np.round(np.mod(val,60), 1)} sec(s)" if val >= 60 else f"{np.round(val,1)} sec(s)"
 
         time_step = 0
         for ep in tqdm(range(planned_epochs)):
@@ -185,29 +194,27 @@ class Net:
             val_loss, val_acc = self.validate_batch(valid_x, valid_y, batch_size)
 
             if ep % report_interval == 0:
-                elapsed, start_interval = time() - start_interval, time()  # reset start, and update elapsed
-                print(f"\nEpoch: {ep}\tInterval Time: {show_time(elapsed)}\tTraining Loss: {train_loss:.6f}\t\tTraining Accuracy: {train_acc:.6f}")
-                print(f"\t\t\t\t\t\tValidation Loss:{val_loss:.6f}\tValidation Accuracy: {val_acc:.6f}")
+                # show train log for interval
+                self._train_log(ep, train_loss, train_acc, val_loss, val_acc, start_interval)
 
-                # check if train loss not decreasing enough
-                train_convergence = (prev_train_loss > 0) and (1 - train_loss / prev_train_loss) < (threshold / 100)
+            # check if train loss not decreasing enough
+            train_convergence = (prev_train_loss > 0) and (1 - train_loss / prev_train_loss) < (threshold / 100)
 
-                # check if validation loss stops decreasing re last 5 models - more likely to occur first
-                valid_convergence = no_decrease >= last_check and val_loss_min < val_loss and val_loss_min > 0
+            # check if validation loss stops decreasing re last 5 models - more likely to occur first
+            valid_convergence = no_decrease >= last_check and val_loss_min < val_loss and val_loss_min > 0
 
             if val_loss <= val_loss_min:
-                    val_loss_min, no_decrease = val_loss, 0
-                    best_model = {
-                        "ep":ep, 
-                        "t_loss":train_loss,
-                        "t_acc":train_acc,
-                        "v_loss":val_loss,
-                        "v_acc":val_acc,
-                    }
-                    self.save_model(train=True)
+                val_loss_min, no_decrease = val_loss, 0
+                best_model = {
+                    "ep":ep, 
+                    "t_loss":train_loss,
+                    "t_acc":train_acc,
+                    "v_loss":val_loss,
+                    "v_acc":val_acc,
+                }
+                self.save_model(train=True)
 
             else: no_decrease += 1
-
             prev_train_loss = train_loss
 
             if valid_convergence or train_convergence:
@@ -217,25 +224,19 @@ class Net:
                     print(f"\n\nMinimum percent change ({threshold}%) in training loss not exceeded.")
 
                 print(f"\nConvergence criteria achieved.\nTraining completed @ Epoch {ep}.")
-                print(f"Total training time: {show_time(time() - train_start)}\n")
-                print(self._display(best_model))
-                print(f"\nBest model '{self.model_name}' saved in 'network/model/' directory.")
+                self._train_finish(train_start, best_model)
 
-                
                 return best_model['ep'], t_loss_graph[:ep], t_acc_graph[:ep], v_loss_graph[:ep], v_acc_graph[:ep]
 
             t_loss_graph[ep], t_acc_graph[ep], v_loss_graph[ep], v_acc_graph[ep] = train_loss, train_acc, val_loss, val_acc
 
         print(f"\n\nMaximum planned number of epoch(s) exhausted.\n\nTraining is complete @ Epoch {ep}.")
-        print(f"Total training time: {show_time(time() - train_start)}")
-        print(self._display(best_model))
-        
+        self._train_finish(train_start, best_model)
         self.save_model(train=True)
 
-        return t_loss_graph, t_acc_graph, v_loss_graph, v_acc_graph
+        return planned_epochs-1, t_loss_graph, t_acc_graph, v_loss_graph, v_acc_graph
 
-
-    def train_network(self, train_set, valid_set, epochs, batch_size=20):
+    def train_network(self, train_set, valid_set, epochs, batch_size=20, report_interval=1):
         """
         Mini batch training.. separated from train that uses a dataloader which can also load batches, but
         I think that it could be overkill and also doesn't shuffle / take random samples like it should
@@ -246,74 +247,62 @@ class Net:
         train_x, train_y = train_set
         valid_x, valid_y = valid_set
 
-        N = train_x.shape[0]
-        loss_graph = np.zeros(epochs)
+        best_model = {"ep":0,"t_loss":0,"t_acc":0,"v_loss":0,"v_acc":0}
 
+        t_loss_graph, t_acc_graph = np.zeros(epochs), np.zeros(epochs)
+        v_loss_graph, v_acc_graph = np.zeros(epochs), np.zeros(epochs)
+
+        start_interval, train_start = time(), time()
+        N, val_loss, val_loss_min = train_x.shape[0], 0, np.Inf
+
+        self.optimizer.epochs = epochs
+        self.optimizer.iters = epochs * (N // batch_size)
+
+        time_step = 0
         for ep in tqdm(range(epochs)):
 
-            order = np.random.permutation(N)
-            train_loss, time_step = 0, 0
-            
+            self.optimizer.epoch = ep
+            order = np.random.permutation(N)  # shuffling indices
+            train_loss, train_acc = 0, 0
+
             for START in range(0, N, batch_size):
 
                 END = min(START + batch_size, N)
-                i = order[START : END] 
+                i = order[START : END]   # batch indices
                 
                 x, label, time_step = train_x[i], train_y[i], time_step + 1
+                self.optimizer.time_step = time_step 
 
-                train_loss += self.train_batch(x, label, time_step)
-            
+                loss, acc = self.train_batch(x, label)
+                train_loss, train_acc = train_loss + loss, train_acc + acc
+                
+            train_acc = train_acc / (N // batch_size)
             train_loss = train_loss / (N // batch_size)
 
             val_loss, val_acc = self.validate_batch(valid_x, valid_y, batch_size)
 
-            if ep % 10 == 0:
-                print(f"Epoch: {ep} \t Training Loss:{train_loss:.6f}")
-                print(f"Epoch: {ep} \t Validation Loss:{val_loss:.6f} \t Validation Accuracy: {val_acc:.6f}")
+            if ep % report_interval == 0:
+                # show train log for interval
+                self._train_log(ep, train_loss, train_acc, val_loss, val_acc, start_interval)
 
-            loss_graph[ep] = train_loss
+            if val_loss <= val_loss_min:
+                val_loss_min = val_loss
+                best_model = {
+                    "ep":ep, 
+                    "t_loss":train_loss,
+                    "t_acc":train_acc,
+                    "v_loss":val_loss,
+                    "v_acc":val_acc,
+                }
+                self.save_model(train=True)
 
-        self.save_model()
+            t_loss_graph[ep], t_acc_graph[ep], v_loss_graph[ep], v_acc_graph[ep] = train_loss, train_acc, val_loss, val_acc
 
-        return loss_graph
-    
-    def train(self, train_loader, valid_loader, epochs):
-        """
-        A training function, load in train / validate data loaders
-        Batch size is applied within loaders themselves that can be configured in loader/test_loader.py where loaders are imported
-        """
-        for ep in range(epochs):
-            tr_loss, tr_accu = [], []
-            va_loss, va_accu = [], []
+        print(f"\n\nModel has finished training after {ep} epoch(s).\n\n")
+        self._train_finish(train_start, best_model)
+        self.save_model(train=True)
 
-            for x, label in train_loader:
-                
-                self.reset_gradients()
-    
-                out = self.forward(x)
-                loss, pred = self.criterion(out, label)
-
-                pred, target = np.argmax(pred, axis=1), np.argmax(label, axis=1)
-                
-                self.backward(self.criterion.backward())
-                self.update() # SGD step
-
-                tr_loss.append(loss)
-                tr_accu.append(np.sum(pred==target) / x.shape[0])
-
-            for x, label in valid_loader:
-
-                out = self.forward(x)
-
-                loss, pred = self.criterion(out, label)
-                pred, target = np.argmax(pred, axis=1), np.argmax(label, axis=1)
-
-                va_loss.append(loss)
-                va_accu.append(np.sum(pred==target) / x.shape[0])
-
-            print(f"Epoch: {ep+1} \t Training Loss:{np.mean(tr_loss):.6f} \t Training Accuracy: {np.mean(tr_accu):.6f}")
-            print(f"Epoch: {ep+1} \t Validate Loss:{np.mean(va_loss):.6f} \t Validate Accuracy: {np.mean(va_accu):.6f}")
-
+        return epochs-1, t_loss_graph, t_acc_graph, v_loss_graph, v_acc_graph
     
     def test2(self, test_set):
         """
@@ -354,7 +343,6 @@ class Net:
            
             print(f'Test Accuracy of\t{i}: {correct[i] / size[i] * 100:.2f}% ({np.sum(correct[i])}/{np.sum(size[i])})')
 
-    
     def test(self, test_loader):
         """
         Test function, loads in test data loader 
