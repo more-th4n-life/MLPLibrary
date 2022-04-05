@@ -1,21 +1,21 @@
 import numpy as np
 from network.layer import Linear
 
-class Optim:
+class Optimizer:
     def __init__(self):
         self.epochs = None
         self.epoch = None
         self.iters = None 
         self.time_step = None
         
-class SGD(Optim):
+class SGD(Optimizer):
     """
     Stochastic Gradient Descent: Also implements weight decay (can be removed by setting to zero)
 
     To add momentum etc. just adds another terms
     """
     def __init__(self, learning_rate=0.04, weight_decay = 0, momentum = 0.5, lr_decay = "default", step_terms = (10, 0.5)):
-        super(Optim, self).__init__()
+        super(Optimizer, self).__init__()
 
         self.lr, self.wd, self.momentum = learning_rate, weight_decay, momentum
 
@@ -85,10 +85,10 @@ class SGD(Optim):
             layer.b += layer.diffb
 
 
-class Adam(Optim):
+class Adam(Optimizer):
 
     def __init__(self, learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-09):
-        super(Optim, self).__init__()
+        super(Optimizer, self).__init__()
 
         self.lr, self.beta1, self.beta2 = learning_rate, beta1, beta2
         
