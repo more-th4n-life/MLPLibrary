@@ -1,4 +1,5 @@
-from loader.process import standardize, normalize, get_data, one_hot, pca, train_test_split, identity
+from network.loader.process import standardize, normalize, get_data, one_hot, pca, train_test_split, identity
+from network.dataset.source import get_data_from_file, get_data_from_url
 import numpy as np
 
 
@@ -9,23 +10,24 @@ def load_train_val_test(method="standardize", n_categories=10, shuffle=True, pca
         "normalize": normalize,
         "none": identity
     }
-    train_data, train_label, test_data, test_label = get_data()  # reads in from numpy files in 'data/' directory
+    
+    train_dat, train_lab, test_dat, test_lab = get_data_from_url()  # reads in from numpy files in 'data/' directory
 
     if pca_N:
-        train_data = pca(train_data, n_comp=pca_N)
-        test_data = pca(test_data, n_comp=pca_N)
+        train_dat = pca(train_dat, n_comp=pca_N)
+        test_dat = pca(test_dat, n_comp=pca_N)
 
     else:
-        train_data = norm[method](train_data)
-        test_data = norm[method](test_data)
+        train_dat = norm[method](train_dat)
+        test_dat = norm[method](test_dat)
 
     if n_categories:
-        train_label = one_hot(train_label, classes=n_categories)
-        test_label = one_hot(test_label, classes=n_categories)
+        train_lab = one_hot(train_lab, classes=n_categories)
+        test_lab = one_hot(test_lab, classes=n_categories)
 
-    train_set, valid_set = train_test_split(train_data, train_label, ratio=0.2, shuffle=shuffle)
+    train_set, valid_set = train_test_split(train_dat, train_lab, ratio=0.2, shuffle=shuffle)
 
-    return train_set, valid_set, (test_data, test_label)
+    return train_set, valid_set, (test_dat, test_lab)
     
 
 def pca_train_val_test(n_comp):

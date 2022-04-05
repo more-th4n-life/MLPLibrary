@@ -1,5 +1,5 @@
 import numpy as np
-from layer import Linear
+from network.layer import Linear
 
 class Optim:
     def __init__(self):
@@ -77,6 +77,7 @@ class SGD(Optim):
             layer.diffW *= self.momentum
             layer.diffb *= self.momentum
 
+            # if weight decay, large W is penalized more than small W
             layer.diffW = lr * (-layer.dW - self.wd * layer.W)
             layer.diffb = lr * np.mean(layer.db, axis=0)
 

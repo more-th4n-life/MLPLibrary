@@ -47,10 +47,11 @@ def pca(data, n_comp=2):
 
 def identity(data):
     return data
-    
+
+
 def get_data():
     ld = lambda fn: load(fn)
-    root = "./data/"
+    root = 'network/data/' 
     return \
     ld(root + "train_data.npy"), \
     ld(root + "train_label.npy"), \

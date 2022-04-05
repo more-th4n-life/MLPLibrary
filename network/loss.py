@@ -54,7 +54,7 @@ class CrossEntropyLoss(Loss):
 
 
 if __name__ == "__main__":
-    from loader.process import one_hot
+    from network.loader.process import one_hot
 
     ce = CrossEntropyLoss()
     x = np.array([[-0.8,  0.5,  0.4, -1.1,  -1.6,  0.2, 1.2, 3.1, 2.0, -0.1]])

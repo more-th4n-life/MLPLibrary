@@ -1,7 +1,7 @@
-from loss import CrossEntropyLoss
-from layer import Linear, Layer
-from activ import ReLU
-from optim import SGD, Adam
+from network.loss import CrossEntropyLoss
+from network.layer import Linear, Layer
+from network.activ import ReLU
+from network.optim import SGD, Adam
 
 import numpy as np
 import os, pickle
@@ -10,7 +10,7 @@ from functools import partial
 from time import time
 
 tqdm = partial(tqdm, position = 0, leave = True)
-show_time = lambda t: f"{int(t//60)} min(s), {np.round(np.mod(t,60), 1)} sec(s)" if t >= 60 else f"{np.round(t,1)} sec(s)"
+show_time = lambda t: f"{int(t//60)} min {np.round(np.mod(t,60), 1)} s" if t >= 60 else f"{np.round(t,1)} sec(s)"
 
 class Net:
     """
@@ -186,6 +186,7 @@ class Net:
             if ep % report_interval == 0:
                 # show train log for interval
                 self._train_log(ep, train_loss, train_acc, val_loss, val_acc, start_interval)
+                start_interval = time()  # reset timer for new report interval
 
             # check if train loss not decreasing enough
             train_convergence = (prev_train_loss > 0) and (1 - train_loss / prev_train_loss) < (threshold / 100)
@@ -224,7 +225,7 @@ class Net:
         self._train_finish(train_start, best_model)
         self.save_model(train=True)
 
-        return planned_epochs-1, t_loss_graph, t_acc_graph, v_loss_graph, v_acc_graph
+        return best_model['ep'], t_loss_graph, t_acc_graph, v_loss_graph, v_acc_graph
 
     def train_network(self, train_set, valid_set, epochs, batch_size=20, report_interval=1):
         """
@@ -252,13 +253,13 @@ class Net:
         for ep in tqdm(range(epochs)):
 
             self.optimizer.epoch = ep
-            order = np.random.permutation(N)  # shuffling indices
+            order = np.random.permutation(N)  # shuffling indices to prevent learning order of training
             train_loss, train_acc = 0, 0
 
             for START in range(0, N, batch_size):
 
                 END = min(START + batch_size, N)
-                i = order[START : END]   # batch indices
+                i = order[START : END]   # mini batch indices
                 
                 x, label, time_step = train_x[i], train_y[i], time_step + 1
                 self.optimizer.time_step = time_step 
@@ -274,6 +275,7 @@ class Net:
             if ep % report_interval == 0:
                 # show train log for interval
                 self._train_log(ep, train_loss, train_acc, val_loss, val_acc, start_interval)
+                start_interval = time()  # reset start
 
             if val_loss <= val_loss_min:
                 val_loss_min = val_loss
@@ -292,7 +294,7 @@ class Net:
         self._train_finish(train_start, best_model)
         self.save_model(train=True)
 
-        return epochs-1, t_loss_graph, t_acc_graph, v_loss_graph, v_acc_graph
+        return best_model['ep'], t_loss_graph, t_acc_graph, v_loss_graph, v_acc_graph
 
     ########################################
     #                                      #                      
@@ -308,7 +310,6 @@ class Net:
         return self.criterion(out)
 
     def predict(self, x, n_classes):
-
         ret = np.zeros((x.shape[0], n_classes))
 
         for i in range(x.shape[0]):
@@ -318,7 +319,6 @@ class Net:
 
 
     def test_network(self, test_set, data="test data"):
-
         x, labels = test_set
         n_classes = labels.shape[1]
 
@@ -360,7 +360,7 @@ class Net:
                 Validation Accuracy: {best_model['v_acc']:.6f}\n"""
 
     def _train_log(self, ep, train_loss, train_acc, val_loss, val_acc, start_interval):
-        elapsed, start_interval = time() - start_interval, time()  # reset start, and update elapsed
+        elapsed = time() - start_interval  # update elapsed
         print(f"\nEpoch: {ep}\tInterval Time: {show_time(elapsed)}\tTraining Loss: {train_loss:.6f}\t\tTraining Accuracy: {train_acc:.6f}")
         print(f"\t\t\t\t\t\tValidation Loss:{val_loss:.6f}\tValidation Accuracy: {val_acc:.6f}")
 
