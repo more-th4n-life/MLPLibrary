@@ -488,7 +488,7 @@ def deep_skinny_convergence():
 
 
 def deep_adam_convergence():
-    train_set, val_set, _ = load_train_val_test(method="standardize", shuffle=True, n_categories=10)
+    train_set, val_set, _ = load_train_val_test(method="standardize", shuffle=True, n_categories=10, source="url")
 
     mlp = Net(optimizer = Adam(), \
                 criterion=CrossEntropyLoss(), L2_reg_term=0.001, batch_norm=True)
@@ -638,7 +638,7 @@ def small_network_adam2():
 def small_network_sgd():
     train_set, val_set, _ = load_train_val_test(method="standardize", shuffle=True, n_categories=10)
 
-    mlp = Net(optimizer = SGD(learning_rate=0.04, weight_decay=0.001, momentum=0.999), \
+    mlp = Net(optimizer = SGD(learning_rate=0.04, weight_decay=0.001, lr_decay="exp", step_terms=(50, 0.8), momentum=0.999), \
                 criterion=CrossEntropyLoss(), L2_reg_term=0.01, batch_norm=True)
 
     # training time: 5 min, 22.7 s   + 30 MORE EPOCHS +   10 EPOCHS 
@@ -660,7 +660,7 @@ def small_network_sgd():
     mlp.set_name("sgd_small")
 
     ep, tl, ta, vl, va = mlp.train_convergence(train_set=train_set, valid_set=val_set, batch_size=500, planned_epochs=10000, \
-                                                report_interval=1, last_check=10, threshold=0.0001)
+                                                report_interval=1, last_check=10, threshold=1e-07)
 
     plot_results(ep, tl, ta, vl, va)
 
@@ -668,9 +668,10 @@ def small_network_sgd():
 
 
 def continue_small_sgd():
+
     model = Net.load_model("network/model/" + "sgd_small")
     train_set, val_set, test_set = load_train_val_test()
-    model.train_network(train_set, val_set, batch_size=500, epochs=10, report_interval=1)
+    model.train_network(train_set, val_set, batch_size=100, epochs=20, report_interval=1)
     
     load_model_test(model.model_name)
 

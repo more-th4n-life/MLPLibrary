@@ -361,13 +361,13 @@ class Net:
 
     def _train_log(self, ep, train_loss, train_acc, val_loss, val_acc, start_interval):
         elapsed = time() - start_interval  # update elapsed
-        print(f"\nEpoch: {ep}\tInterval Time: {show_time(elapsed)}\tTraining Loss: {train_loss:.6f}\t\tTraining Accuracy: {train_acc:.6f}")
+        print(f"Epoch: {ep}\tInterval Time: {show_time(elapsed)}\tTraining Loss: {train_loss:.6f}\t\tTraining Accuracy: {train_acc:.6f}")
         print(f"\t\t\t\t\t\tValidation Loss:{val_loss:.6f}\tValidation Accuracy: {val_acc:.6f}")
 
     def _train_finish(self, train_start, best_model):
         print(f"Total training time: {show_time(time() - train_start)}")
         print(self._display(best_model))
-        print(f"\nBest model '{self.model_name}' saved in 'network/model/' directory.")
+        print(f"\nBest model '{self.model_name}' saved in 'model/' directory.")
 
 
     ############################################################
@@ -377,29 +377,30 @@ class Net:
     ############################################################
     
     def save_model(self, train=False):
-        path = "network/model/"
-        try:
-            path_name = path + repr(self)
-            with open(path_name, "wb") as file:
-                pickle.dump(self, file, protocol = pickle.HIGHEST_PROTOCOL)
+        file_path = os.path.join(os.getcwd(), 'model')
+        if os.path.exists(file_path):
+            try:
+                with open(file_path + "/" + repr(self), "wb") as file:
+                    pickle.dump(self, file, protocol = pickle.HIGHEST_PROTOCOL)
 
-            if train: return self
+                if train: return
 
-            print("\nModel Save Successful!", end='\n\n')
-            print(f"Model name: {repr(self)}")
-            wd = os.getcwd().replace("\\","/") + '/'
-            print(f"Saved in: {wd + path}", end='\n\n')
-            print(f"Full path: {wd + path + repr(self)}")
-
-            
-        except Exception as e:
-            print("Save unsuccessful: ", e)
+                print("\nModel Save Successful!", end='\n\n')
+                print(f"Model name: {repr(self)}")
+                format_path = file_path.replace("\\","/") + '/'
+                print(f"Saved in: {format_path}", end='\n\n')
+                print(f"Full path: {format_path + repr(self)}")
+            except Exception as e:
+                print("Save unsuccessful: ", e)
+        else:
+            os.mkdir(file_path)
+            return self.save_model(train)
 
     
     @staticmethod
-    def load_model(path):
+    def load_model(file_path):
         try:
-            with open(path, "rb") as file:
+            with open(file_path, "rb") as file:
                 return pickle.load(file)
         except Exception as e:
             print("Load unsuccessful: ", e)
