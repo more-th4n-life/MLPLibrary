@@ -1,10 +1,10 @@
 import numpy as np
 
-
 class Layer():
     """
-    Abstract class for layer: used to differentiate b/w activations
-    i.e. For updating weights and bias 
+    Parent class for Hidden Layers
+
+    This class is inherited by currently only supported child class: Linear
     """
     def __init__(self):
         pass
@@ -16,15 +16,18 @@ class Layer():
         pass
 
 class Linear(Layer):
+    """
+    Class for Linear Layer
+
+    Args:
+        indim (int): input dimensions of mini-batch data or number of dimensions of input feature map 
+        outdim (int): output dimensions or number of hidden neurons within linear layer to process input
+        dropout (float): value between 0 and 1 to indicate ratio of neurons to randomly deactivate in layer
+        weights (str): weights init method with typical selection from "xavier" and "kaiming" (defaults to "xavier")'
+        bias (str): bias init method with selection from above and either "zero" or "const" (defaults to "zero")
+    """
 
     def __init__(self, indim, outdim, dropout=0, weights="xavier", bias="zero"):
-        """
-        Layer: Linear y = xw + b
-
-        Args
-            indim: incoming n features
-            outdim: outgoing m features
-        """
         self.indim, self.outdim = indim, outdim
         self.batch_norm, self.alpha, self.L2_reg_term = False, None, None    # set within network as parameters
         self.dropout = dropout
@@ -64,11 +67,21 @@ class Linear(Layer):
         self.predict = False
 
     def __repr__(self):
+        """
+        Repr method for Linear class, used in Net class when generating model names.
+        """
         return f"[{self.outdim}]"
 
     def xavier(self, size, gain=1):
         """
-        Helper function for Xavier Uniform Initialisation
+        Function for Xavier Uniform Initialization, primarily used for randomly initializing
+        weight values in layer, however, can be used for biases as well.
+
+        Args:
+            size (tuple): dimensions of 
+
+        Returns:
+            np.ndarray: returns ReLU-fied output of the mini-batch data
         """
         i = gain * np.sqrt(6. / np.sum(size))
         return np.random.uniform(low = -i, high = i, size = size)

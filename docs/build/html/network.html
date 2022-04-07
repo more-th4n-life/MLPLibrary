@@ -42,6 +42,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installing.html">Setup &amp; Installation</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Guide to MLPLibrary:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mlplibrary-guide.html">MLPLibrary Features and Functionality</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Modules</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">network</a><ul class="current">
@@ -125,7 +129,8 @@
 <dt class="sig sig-object py" id="network.activ.Activation">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.activ.</span></span><span class="sig-name descname"><span class="pre">Activation</span></span><a class="headerlink" href="#network.activ.Activation" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Abstract class for activations</p>
+<p>Parent class for Non-Linear Activation Functions</p>
+<p>This class is inherited by currently supported child classes: ReLU and LeakyReLU.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.activ.Activation.backward">
 <span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.Activation.backward" title="Permalink to this definition"></a></dt>
@@ -140,18 +145,53 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="network.activ.LeakyReLU">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.activ.</span></span><span class="sig-name descname"><span class="pre">LeakyReLU</span></span><a class="headerlink" href="#network.activ.LeakyReLU" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.activ.</span></span><span class="sig-name descname"><span class="pre">LeakyReLU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leak</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.LeakyReLU" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#network.activ.Activation" title="network.activ.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.activ.Activation</span></code></a></p>
+<p>Class for Activation function: Leaky Rectified Linear Unit (LeakyReLU)</p>
+<p>Formula: max(kx, x)
+Derivative: k if x &lt;= 0 else 1 (dy then scales the derivative by multiplication)</p>
+<p>Output is then scaled by multiplication with dy in the backward pass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>leak</strong> (<em>float</em>) – the leaky amount (slope) in Leaky ReLU function (usually very small).             Defaults to 0.03 (arbitrarily chosen).</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.activ.LeakyReLU.backward">
 <span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.LeakyReLU.backward" title="Permalink to this definition"></a></dt>
-<dd><p>If &gt; 0 ret 1 else return leaky amount</p>
+<dd><p>Passes the gradient of the loss (cost / error) function w.r.t weights in
+previous layers and applies the derivative of the ReLU function in processing
+input for the backward pass of backpropagation to update weights and biases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dy</strong> (<em>np.ndarray</em>) – gradient of the loss function in backward pass</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns derivative of ReLU applied to dy and cached x in forward pass.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.activ.LeakyReLU.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.LeakyReLU.forward" title="Permalink to this definition"></a></dt>
-<dd><p>If &gt; 0 return x else return leaky amount * x</p>
+<dd><p>Calculate Leaky ReLU-fied output of passed in mini-batch data (x) in forward pass.
+This function is activated during both training and prediction. This is then
+fed into the next layer (most likely a Linear layer).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>np.ndarray</em>) – mini-batch data passed to network in forward pass</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns Leaky ReLU-fied output of the mini-batch data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -160,16 +200,46 @@
 <dt class="sig sig-object py" id="network.activ.ReLU">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.activ.</span></span><span class="sig-name descname"><span class="pre">ReLU</span></span><a class="headerlink" href="#network.activ.ReLU" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#network.activ.Activation" title="network.activ.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.activ.Activation</span></code></a></p>
+<p>Class for Activation function: Rectified Linear Unit (ReLU)</p>
+<p>Formula: max(0, x)
+Derivative: 0 if x &lt;= 0 else 1</p>
+<p>Output is then scaled by multiplication with dy in the backward pass.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.activ.ReLU.backward">
 <span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.ReLU.backward" title="Permalink to this definition"></a></dt>
-<dd><p>If x &lt;= 0 ret 0 else 1</p>
+<dd><p>Passes the gradient of the loss (cost / error) function w.r.t weights in
+previous layers and applies the derivative of the ReLU function in processing
+input for the backward pass of backpropagation to update weights and biases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dy</strong> (<em>np.ndarray</em>) – gradient of the loss function in backward pass</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns derivative of ReLU applied to dy and cached x in forward pass.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.activ.ReLU.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.ReLU.forward" title="Permalink to this definition"></a></dt>
-<dd><p>Returns x if x &gt; 0</p>
+<dd><p>Calculates ReLU-fied output of passed in mini-batch data (x) in forward pass.
+This function is activated during both training and prediction. This is then
+fed into the next layer (most likely a Linear layer).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>np.ndarray</em>) – mini-batch data passed to network in forward pass</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns ReLU-fied output of the mini-batch data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

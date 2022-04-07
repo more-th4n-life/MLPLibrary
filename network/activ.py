@@ -2,7 +2,9 @@ import numpy as np
 
 class Activation:
     """
-    Abstract class for activations 
+    Parent class for Non-Linear Activation Functions
+
+    This class is inherited by currently supported child classes: ReLU and LeakyReLU.
     """
     def __init__(self):
         pass
@@ -12,48 +14,94 @@ class Activation:
         return dy
 
 class ReLU(Activation):
+    """
+    Class for Activation function: Rectified Linear Unit (ReLU)
+
+    Output is then scaled by multiplication with dy in the backward pass.
+    """
     def __init__(self):
-        """
-        Rectified Linear Unit max(x, 0)
-        """
         self.x = None
 
     def __repr__(self):
+        """
+        Repr method for ReLU class, used in Net class when generating model names.
+        """
         return "ReLU"
 
     def forward(self, x):
         """
-        Returns x if x > 0
+        Calculates ReLU-fied output of passed in mini-batch data (x) in forward pass.
+        This function is activated during both training and prediction. This is then
+        fed into the next layer (most likely a Linear layer).
+
+        Args:
+            x (np.ndarray): mini-batch data passed to network in forward pass
+
+        Returns:
+            np.ndarray: returns ReLU-fied output of the mini-batch data
         """
         self.x = x
         return x * (x > 0)
 
     def backward(self, dy):
         """
-        If x <= 0 ret 0 else 1
+        Passes the gradient of the loss (cost / error) function w.r.t weights in 
+        previous layers and applies the derivative of the ReLU function in processing
+        input for the backward pass of backpropagation to update weights and biases.
+
+        Args:
+            dy (np.ndarray): gradient of the loss function in backward pass
+
+        Returns:
+            np.ndarray: returns derivative of ReLU applied to dy and cached x in forward pass.
         """
         return dy * (self.x > 0)
 
 class LeakyReLU(Activation):
-    def __init__(self):
-        """
-        Leaky ReLU
-        """
-        self.leak = 0.03
+    """
+    Class for Activation function: Leaky Rectified Linear Unit (LeakyReLU)
+
+    Output is then scaled by multiplication with dy in the backward pass.
+
+    Args:
+        leak (float): the leaky amount (slope) in Leaky ReLU function (usually very small). \
+            Defaults to 0.03 (arbitrarily chosen amount).
+    """
+    def __init__(self, leak = 0.03):
+        self.leak = leak
 
     def __repr__(self):
+        """
+        Repr method for ReLU class, used in Net class when generating model names.
+        """
         return "LeakyReLU"
 
     def forward(self, x):
         """
-        If > 0 return x else return leaky amount * x
+        Calculate Leaky ReLU-fied output of passed in mini-batch data (x) in forward pass.
+        This function is activated during both training and prediction. This is then
+        fed into the next layer (most likely a Linear layer).
+
+        Args:
+            x (np.ndarray): mini-batch data passed to network in forward pass
+
+        Returns:
+            np.ndarray: returns Leaky ReLU-fied output of the mini-batch data
         """
         self.x = x
         return x * (x > 0) + (x <= 0) * self.leak * x
 
     def backward(self, dy):
         """
-        If > 0 ret 1 else return leaky amount
+        Passes the gradient of the loss (cost / error) function w.r.t weights in 
+        previous layers and applies the derivative of the ReLU function in processing
+        input for the backward pass of backpropagation to update weights and biases.
+
+        Args:
+            dy (np.ndarray): gradient of the loss function in backward pass
+
+        Returns:
+            np.ndarray: returns derivative of ReLU applied to dy and cached x in forward pass.
         """
         return dy * (self.x > 0) + (self.x <= 0) * dy * self.leak
 

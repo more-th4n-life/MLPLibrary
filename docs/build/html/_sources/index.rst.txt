@@ -15,7 +15,7 @@ Quickstart Guide
     Quickly get started installing and using our Python-based MLPLibrary.
 
 MLPLibrary Functional Documentation
----------------------------------
+------------------------------------
 
 :doc:`mlplibrary-guide`
     For a quick understanding of MLPLibrary fundamentals and use
