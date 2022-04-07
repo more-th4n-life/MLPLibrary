@@ -636,7 +636,7 @@ def small_network_adam2():
 
 
 def small_network_sgd():
-    train_set, val_set, _ = load_train_val_test(method="standardize", shuffle=True, n_categories=10)
+    train_set, val_set, _ = load_train_val_test(source="file", method="standardize", shuffle=True, n_categories=10)
 
     mlp = Net(optimizer = SGD(learning_rate=0.04, weight_decay=0.001, lr_decay="exp", step_terms=(50, 0.8), momentum=0.999), \
                 criterion=CrossEntropyLoss(), L2_reg_term=0.01, batch_norm=True)
@@ -700,7 +700,7 @@ def main():
     
     #small_network_adam()
     small_network_sgd()
-    continue_small_sgd()
+    #continue_small_sgd()
     #load_model_predict()
     #load_model_test()
 

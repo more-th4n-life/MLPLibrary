@@ -18,7 +18,7 @@ def get_data_from_url():
 
 def get_data_from_file():
     ld = lambda fn: np.load(fn)
-    root = 'network/data/' 
+    root = 'network/dataset/' 
     return \
     ld(root + "train_data.npy"), \
     ld(root + "train_label.npy"), \
