@@ -75,29 +75,52 @@ class Linear(Layer):
     def xavier(self, size, gain=1):
         """
         Function for Xavier Uniform Initialization, primarily used for randomly initializing
-        weight values in layer, however, can be used for biases as well.
+        weight values in a layer, however, can be used for biases as well.
 
         Args:
-            size (tuple): dimensions of 
+            size (tuple): dimensions of generated np.ndarray i.e. (#row, #col)
+            gain (int): scalar multiplication of generated weight/bias values 
 
         Returns:
-            np.ndarray: returns ReLU-fied output of the mini-batch data
+            np.ndarray: returns weights/bias of given size (and gain) using Xavier initialization
         """
         i = gain * np.sqrt(6. / np.sum(size))
         return np.random.uniform(low = -i, high = i, size = size)
 
     def kaiming(self, size, gain=1):
         """
-        Helper function for Kaiming-He Uniform Initialisation
+        Function for Kaiming-He Uniform Initialization, primarily used for randomly initializing
+        weight values in a layer, however, can also be used for biases as well.
+
+        Args:
+            size (tuple): dimensions of generated np.ndarray i.e. (#row, #col)
+            gain (int): scalar multiplication of generated weight/bias values 
+
+        Returns:
+            np.ndarray: returns weights/bias of given size (and gain) using Kaiming-He initialization
         """
         i = gain * np.sqrt(6. / size[0])
         return np.random.uniform(low = -i, high = i, size = size)
 
     def batch_norm_forward(self, x):
         """
-        Batch norm forward pass using linear layer output
-        If predict (validation / test): 
-            Use running mean / var from training to compute norm
+        Helper function for a forward pass using batch normalization on mini-batch x.
+        If making a prediction (i.e. not undergoing backpropagation and only making a forward pass),
+        then the running means and variance calculated in this layer from training are then used 
+        instead to normalise the output of this batch for the next layer. The predict function is
+        flagged True in the Net class upon calling the Net.predict() method on the network, this
+        sets all layer.predict attributes to True to determine to use previously calculated means
+        and variance for normalizing x, or if False (during training) to calculate this mean and variance.
+
+        Gamma and beta are initialized during initialization of Linear layer to scale amd shift our
+        normalized value of x, alpha is a scalar term set upon Net initialization to scale the running mean and variance.
+
+        Args:
+            x (np.ndarray): mini-batch x during forward pass of training or prediction.
+
+        Returns:
+            np.ndarray: returns normalized mini-batch x, that is scaled with gamma and shifted with beta
+        
         """
         if self.predict: self.norm = (x - self.run_mean) / np.sqrt(self.run_var + self.epsilon)
 
@@ -115,7 +138,19 @@ class Linear(Layer):
 
     def batch_norm_backward(self, dy):
         """
-        Batch norm derivative backward pass to linear layer
+        Helper function for the backward pass of batch normalization using the derivative of the loss
+        function. Partial derivatives for shift values of beta are calculated as the sum of all values over the 
+        input derivative of the loss function and derivatives for for gamma using the chain rule as the sum of 
+        all normalized values pre-cached values in forward pass multiplied against the derivative of loss. 
+        This is then used to calculate the derivate for the mini-batch x w.r.t. the loss function and returns
+        it's batch normalized value.
+
+        Args:
+            dy (np.ndarray): derivative of the loss function passed in via back-propagation.
+
+        Returns:
+            np.ndarray: returns batch-normalized value for the derivative of the loss function in this layer
+        
         """
         dbeta = np.sum(dy, axis = 0, keepdims=True)
         dgamma = np.sum(self.norm * dy, axis=0, keepdims=True)
@@ -124,22 +159,49 @@ class Linear(Layer):
 
     def dropout_forward(self, x):
         """
-        Disable dropout during test / validation, only used during training 
+        Helper function for applying dropout to the forward pass in either training or prediction. If making a
+        prediction, dropout is deactivated. During training, dropout randomly chooses neurons to drop in the 
+        linear transformation of x in the forward pass w.r.t. each neuron's weight and bias. Dropout parameter
+        is initialized upon Layer initialization, and used to drop a percentage of the neuron's in this Layer.
+
+        Args:
+            x (np.ndarray): mini-batch x during forward pass of training or prediction.
+
+        Returns:
+            np.ndarray: returns new x values whereby proportion (dropout) is randomly masked as zeros, turned off.
         """
         if self.predict: return x
-
+        
         self.mask = np.random.binomial(1, (1 - self.dropout), size = x.shape)
         return x * self.mask / (1 - self.dropout)
+        
 
     def dropout_backward(self, dy):
         """
-        Dropout correction for backward pass
+        Helper function for applying dropout to the backward pass on the derivative for the loss function. Using
+        the cached mask from forward pass in this layer, applies this mask similarly to the derivative of loss.
+
+        Args:
+            dy (np.ndarray): derivative of the loss function passed in via back-propagation.
+
+        Returns:
+            np.ndarray: returns dx values whereby proportion (dropout) is randomly masked as zeros, turned off.
         """
         return dy * self.mask / (1 - self.dropout)
 
     def forward(self, x):
         """
-        Apply wx + b linear transformations
+        Main method for Layer in making a forward pass in training / prediction. Using linear transformation
+        on mini-batch x to calculate an output w.r.t. learned weights and biases from backpropagation. This 
+        transformation: y = wx + b; takes mini-batch x as input, scales it by learned weight values, and shifts
+        it by learned bias values to calculate output y to be used in the next layer. Ordering of applying both
+        batch-norm and dropout is calculated in the order stated, when both are set for use within the Layer.
+
+        Args:
+            x (np.ndarray): mini-batch x during forward pass of training or prediction.
+
+        Returns:
+            np.ndarray: returns linearly transformed x values as input to next layer (i.e. for activation)
         """
         self.x = x
         out = x @ self.W + self.b
@@ -155,7 +217,20 @@ class Linear(Layer):
 
     def backward(self, dy):
         """
-        Calculate gradient wrt dy for update step
+        Main method for Layer in making a backward pass for backpropagation. Order of applying the gradients
+        of dropout and batch norm are applied in the order stated and is a mirror application of the forward pass.
+        The derivative of the weight values are calculated as the dot product of loss derivative with cached input
+        x (that is matrix rotated / transposed) and for bias, the sum of the gradient values of the loss function.
+        Lastly, derivative of the mini-batch x is returned as the dot product between rotated gradient of weights
+        multiplied against the the derivative of the loss function values. If L2 regularization is applied (with 
+        value determined upon the initialization of Net), then the derivative of weights reduced by a factor of this
+        term, the value of weights and the size of mini-batch x. This is understood to penalize larger weight values.
+        
+        Args:
+            dy (np.ndarray): derivative of the loss function passed in via back-propagation.
+
+        Returns:
+            np.ndarray: derivative of the loss function w.r.t. the weights of this layer.
         """
         if self.dropout:
             dy = self.dropout_backward(dy)
@@ -174,7 +249,8 @@ class Linear(Layer):
 
     def reset_gradients(self):
         """
-        Zero out gradients after each sample
+        Method to reset the gradient of the weight and bias values for each Layer, called upon
+        after each iteration of batch training.
         """
         self.dW = np.zeros_like(self.W)
         self.db = np.zeros_like(self.b)

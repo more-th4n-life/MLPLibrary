@@ -148,12 +148,10 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.activ.</span></span><span class="sig-name descname"><span class="pre">LeakyReLU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leak</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.LeakyReLU" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#network.activ.Activation" title="network.activ.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.activ.Activation</span></code></a></p>
 <p>Class for Activation function: Leaky Rectified Linear Unit (LeakyReLU)</p>
-<p>Formula: max(kx, x)
-Derivative: k if x &lt;= 0 else 1 (dy then scales the derivative by multiplication)</p>
 <p>Output is then scaled by multiplication with dy in the backward pass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>leak</strong> (<em>float</em>) – the leaky amount (slope) in Leaky ReLU function (usually very small).             Defaults to 0.03 (arbitrarily chosen).</p>
+<dd class="field-odd"><p><strong>leak</strong> (<em>float</em>) – the leaky amount (slope) in Leaky ReLU function (usually very small).             Defaults to 0.03 (arbitrarily chosen amount).</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -201,8 +199,6 @@ fed into the next layer (most likely a Linear layer).</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.activ.</span></span><span class="sig-name descname"><span class="pre">ReLU</span></span><a class="headerlink" href="#network.activ.ReLU" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#network.activ.Activation" title="network.activ.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.activ.Activation</span></code></a></p>
 <p>Class for Activation function: Rectified Linear Unit (ReLU)</p>
-<p>Formula: max(0, x)
-Derivative: 0 if x &lt;= 0 else 1</p>
 <p>Output is then scaled by multiplication with dy in the backward pass.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.activ.ReLU.backward">
@@ -251,8 +247,8 @@ fed into the next layer (most likely a Linear layer).</p>
 <dt class="sig sig-object py" id="network.layer.Layer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.layer.</span></span><span class="sig-name descname"><span class="pre">Layer</span></span><a class="headerlink" href="#network.layer.Layer" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Abstract class for layer: used to differentiate b/w activations
-i.e. For updating weights and bias</p>
+<p>Parent class for Hidden Layers</p>
+<p>This class is inherited by currently only supported child class: Linear</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.layer.Layer.backward">
 <span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Layer.backward" title="Permalink to this definition"></a></dt>
@@ -274,62 +270,195 @@ i.e. For updating weights and bias</p>
 <dt class="sig sig-object py" id="network.layer.Linear">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.layer.</span></span><span class="sig-name descname"><span class="pre">Linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xavier'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zero'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#network.layer.Layer" title="network.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.layer.Layer</span></code></a></p>
+<p>Class for Linear Layer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indim</strong> (<em>int</em>) – input dimensions of mini-batch data or number of dimensions of input feature map</p></li>
+<li><p><strong>outdim</strong> (<em>int</em>) – output dimensions or number of hidden neurons within linear layer to process input</p></li>
+<li><p><strong>dropout</strong> (<em>float</em>) – value between 0 and 1 to indicate ratio of neurons to randomly deactivate in layer</p></li>
+<li><p><strong>weights</strong> (<em>str</em>) – weights init method with typical selection from “xavier” and “kaiming” (defaults to “xavier”)’</p></li>
+<li><p><strong>bias</strong> (<em>str</em>) – bias init method with selection from above and either “zero” or “const” (defaults to “zero”)</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.layer.Linear.backward">
 <span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.backward" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate gradient wrt dy for update step</p>
+<dd><p>Main method for Layer in making a backward pass for backpropagation. Order of applying the gradients
+of dropout and batch norm are applied in the order stated and is a mirror application of the forward pass.
+The derivative of the weight values are calculated as the dot product of loss derivative with cached input
+x (that is matrix rotated / transposed) and for bias, the sum of the gradient values of the loss function.
+Lastly, derivative of the mini-batch x is returned as the dot product between rotated gradient of weights
+multiplied against the the derivative of the loss function values. If L2 regularization is applied (with
+value determined upon the initialization of Net), then the derivative of weights reduced by a factor of this
+term, the value of weights and the size of mini-batch x. This is understood to penalize larger weight values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dy</strong> (<em>np.ndarray</em>) – derivative of the loss function passed in via back-propagation.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>derivative of the loss function w.r.t. the weights of this layer.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.layer.Linear.batch_norm_backward">
 <span class="sig-name descname"><span class="pre">batch_norm_backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.batch_norm_backward" title="Permalink to this definition"></a></dt>
-<dd><p>Batch norm derivative backward pass to linear layer</p>
+<dd><p>Helper function for the backward pass of batch normalization using the derivative of the loss
+function. Partial derivatives for shift values of beta are calculated as the sum of all values over the
+input derivative of the loss function and derivatives for for gamma using the chain rule as the sum of
+all normalized values pre-cached values in forward pass multiplied against the derivative of loss.
+This is then used to calculate the derivate for the mini-batch x w.r.t. the loss function and returns
+it’s batch normalized value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dy</strong> (<em>np.ndarray</em>) – derivative of the loss function passed in via back-propagation.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns batch-normalized value for the derivative of the loss function in this layer</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.layer.Linear.batch_norm_forward">
 <span class="sig-name descname"><span class="pre">batch_norm_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.batch_norm_forward" title="Permalink to this definition"></a></dt>
-<dd><p>Batch norm forward pass using linear layer output
-If predict (validation / test):</p>
-<blockquote>
-<div><p>Use running mean / var from training to compute norm</p>
-</div></blockquote>
+<dd><p>Helper function for a forward pass using batch normalization on mini-batch x.
+If making a prediction (i.e. not undergoing backpropagation and only making a forward pass),
+then the running means and variance calculated in this layer from training are then used
+instead to normalise the output of this batch for the next layer. The predict function is
+flagged True in the Net class upon calling the Net.predict() method on the network, this
+sets all layer.predict attributes to True to determine to use previously calculated means
+and variance for normalizing x, or if False (during training) to calculate this mean and variance.</p>
+<p>Gamma and beta are initialized during initialization of Linear layer to scale amd shift our
+normalized value of x, alpha is a scalar term set upon Net initialization to scale the running mean and variance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>np.ndarray</em>) – mini-batch x during forward pass of training or prediction.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns normalized mini-batch x, that is scaled with gamma and shifted with beta</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.layer.Linear.dropout_backward">
 <span class="sig-name descname"><span class="pre">dropout_backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.dropout_backward" title="Permalink to this definition"></a></dt>
-<dd><p>Dropout correction for backward pass</p>
+<dd><p>Helper function for applying dropout to the backward pass on the derivative for the loss function. Using
+the cached mask from forward pass in this layer, applies this mask similarly to the derivative of loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dy</strong> (<em>np.ndarray</em>) – derivative of the loss function passed in via back-propagation.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns dx values whereby proportion (dropout) is randomly masked as zeros, turned off.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.layer.Linear.dropout_forward">
 <span class="sig-name descname"><span class="pre">dropout_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.dropout_forward" title="Permalink to this definition"></a></dt>
-<dd><p>Disable dropout during test / validation, only used during training</p>
+<dd><p>Helper function for applying dropout to the forward pass in either training or prediction. If making a
+prediction, dropout is deactivated. During training, dropout randomly chooses neurons to drop in the
+linear transformation of x in the forward pass w.r.t. each neuron’s weight and bias. Dropout parameter
+is initialized upon Layer initialization, and used to drop a percentage of the neuron’s in this Layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>np.ndarray</em>) – mini-batch x during forward pass of training or prediction.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns new x values whereby proportion (dropout) is randomly masked as zeros, turned off.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.layer.Linear.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.forward" title="Permalink to this definition"></a></dt>
-<dd><p>Apply wx + b linear transformations</p>
+<dd><p>Main method for Layer in making a forward pass in training / prediction. Using linear transformation
+on mini-batch x to calculate an output w.r.t. learned weights and biases from backpropagation. This
+transformation: y = wx + b; takes mini-batch x as input, scales it by learned weight values, and shifts
+it by learned bias values to calculate output y to be used in the next layer. Ordering of applying both
+batch-norm and dropout is calculated in the order stated, when both are set for use within the Layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>np.ndarray</em>) – mini-batch x during forward pass of training or prediction.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns linearly transformed x values as input to next layer (i.e. for activation)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.layer.Linear.kaiming">
 <span class="sig-name descname"><span class="pre">kaiming</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.kaiming" title="Permalink to this definition"></a></dt>
-<dd><p>Helper function for Kaiming-He Uniform Initialisation</p>
+<dd><p>Function for Kaiming-He Uniform Initialization, primarily used for randomly initializing
+weight values in a layer, however, can also be used for biases as well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>size</strong> (<em>tuple</em>) – dimensions of generated np.ndarray i.e. (#row, #col)</p></li>
+<li><p><strong>gain</strong> (<em>int</em>) – scalar multiplication of generated weight/bias values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns weights/bias of given size (and gain) using Kaiming-He initialization</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.layer.Linear.reset_gradients">
 <span class="sig-name descname"><span class="pre">reset_gradients</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.reset_gradients" title="Permalink to this definition"></a></dt>
-<dd><p>Zero out gradients after each sample</p>
+<dd><p>Method to reset the gradient of the weight and bias values for each Layer, called upon
+after each iteration of batch training.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.layer.Linear.xavier">
 <span class="sig-name descname"><span class="pre">xavier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.xavier" title="Permalink to this definition"></a></dt>
-<dd><p>Helper function for Xavier Uniform Initialisation</p>
+<dd><p>Function for Xavier Uniform Initialization, primarily used for randomly initializing
+weight values in a layer, however, can be used for biases as well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>size</strong> (<em>tuple</em>) – dimensions of generated np.ndarray i.e. (#row, #col)</p></li>
+<li><p><strong>gain</strong> (<em>int</em>) – scalar multiplication of generated weight/bias values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns weights/bias of given size (and gain) using Xavier initialization</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
