@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>network package &mdash; MLPLibrary 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="network.dataset package" href="network.dataset.html" />
+    <link rel="prev" title="network" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MLPLibrary
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Setup and Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Setup &amp; Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">network</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">network package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="network.dataset.html">network.dataset package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.loader.html">network.loader package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.model.html">network.model package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-network.activ">network.activ module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-network.layer">network.layer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-network.loss">network.loss module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-network.net">network.net module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-network.optim">network.optim module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-network">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MLPLibrary</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="modules.html">network</a> &raquo;</li>
+      <li>network package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/network.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="network-package">
+<h1>network package<a class="headerlink" href="#network-package" title="Permalink to this headline"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="network.dataset.html">network.dataset package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="network.dataset.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="network.dataset.html#module-network.dataset.source">network.dataset.source module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="network.dataset.html#module-network.dataset">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="network.loader.html">network.loader package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="network.loader.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="network.loader.html#module-network.loader.data_loader">network.loader.data_loader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="network.loader.html#module-network.loader.process">network.loader.process module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="network.loader.html#module-network.loader">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="network.model.html">network.model package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="network.model.html#module-network.model">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</section>
+<section id="module-network.activ">
+<span id="network-activ-module"></span><h2>network.activ module<a class="headerlink" href="#module-network.activ" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="network.activ.Activation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.activ.</span></span><span class="sig-name descname"><span class="pre">Activation</span></span><a class="headerlink" href="#network.activ.Activation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract class for activations</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="network.activ.Activation.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.Activation.backward" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.activ.Activation.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.Activation.forward" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="network.activ.LeakyReLU">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.activ.</span></span><span class="sig-name descname"><span class="pre">LeakyReLU</span></span><a class="headerlink" href="#network.activ.LeakyReLU" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#network.activ.Activation" title="network.activ.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.activ.Activation</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="network.activ.LeakyReLU.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.LeakyReLU.backward" title="Permalink to this definition"></a></dt>
+<dd><p>If &gt; 0 ret 1 else return leaky amount</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.activ.LeakyReLU.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.LeakyReLU.forward" title="Permalink to this definition"></a></dt>
+<dd><p>If &gt; 0 return x else return leaky amount * x</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="network.activ.ReLU">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.activ.</span></span><span class="sig-name descname"><span class="pre">ReLU</span></span><a class="headerlink" href="#network.activ.ReLU" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#network.activ.Activation" title="network.activ.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.activ.Activation</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="network.activ.ReLU.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.ReLU.backward" title="Permalink to this definition"></a></dt>
+<dd><p>If x &lt;= 0 ret 0 else 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.activ.ReLU.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.activ.ReLU.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Returns x if x &gt; 0</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-network.layer">
+<span id="network-layer-module"></span><h2>network.layer module<a class="headerlink" href="#module-network.layer" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="network.layer.Layer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.layer.</span></span><span class="sig-name descname"><span class="pre">Layer</span></span><a class="headerlink" href="#network.layer.Layer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract class for layer: used to differentiate b/w activations
+i.e. For updating weights and bias</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="network.layer.Layer.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Layer.backward" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.layer.Layer.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Layer.forward" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.layer.Layer.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Layer.update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="network.layer.Linear">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.layer.</span></span><span class="sig-name descname"><span class="pre">Linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xavier'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zero'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#network.layer.Layer" title="network.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.layer.Layer</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="network.layer.Linear.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.backward" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate gradient wrt dy for update step</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.layer.Linear.batch_norm_backward">
+<span class="sig-name descname"><span class="pre">batch_norm_backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.batch_norm_backward" title="Permalink to this definition"></a></dt>
+<dd><p>Batch norm derivative backward pass to linear layer</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.layer.Linear.batch_norm_forward">
+<span class="sig-name descname"><span class="pre">batch_norm_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.batch_norm_forward" title="Permalink to this definition"></a></dt>
+<dd><p>Batch norm forward pass using linear layer output
+If predict (validation / test):</p>
+<blockquote>
+<div><p>Use running mean / var from training to compute norm</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.layer.Linear.dropout_backward">
+<span class="sig-name descname"><span class="pre">dropout_backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.dropout_backward" title="Permalink to this definition"></a></dt>
+<dd><p>Dropout correction for backward pass</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.layer.Linear.dropout_forward">
+<span class="sig-name descname"><span class="pre">dropout_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.dropout_forward" title="Permalink to this definition"></a></dt>
+<dd><p>Disable dropout during test / validation, only used during training</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.layer.Linear.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Apply wx + b linear transformations</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.layer.Linear.kaiming">
+<span class="sig-name descname"><span class="pre">kaiming</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.kaiming" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function for Kaiming-He Uniform Initialisation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.layer.Linear.reset_gradients">
+<span class="sig-name descname"><span class="pre">reset_gradients</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.reset_gradients" title="Permalink to this definition"></a></dt>
+<dd><p>Zero out gradients after each sample</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.layer.Linear.xavier">
+<span class="sig-name descname"><span class="pre">xavier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.layer.Linear.xavier" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function for Xavier Uniform Initialisation</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-network.loss">
+<span id="network-loss-module"></span><h2>network.loss module<a class="headerlink" href="#module-network.loss" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="network.loss.CrossEntropyLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.loss.</span></span><span class="sig-name descname"><span class="pre">CrossEntropyLoss</span></span><a class="headerlink" href="#network.loss.CrossEntropyLoss" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#network.loss.Loss" title="network.loss.Loss"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.loss.Loss</span></code></a></p>
+<p>Calc softmax then negative log-likelihood loss</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="network.loss.CrossEntropyLoss.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.loss.CrossEntropyLoss.backward" title="Permalink to this definition"></a></dt>
+<dd><p>Returns difference between softmax probs and ground truth for update</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.loss.CrossEntropyLoss.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.loss.CrossEntropyLoss.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Uses softmax to calculate Cross entropy loss</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.loss.CrossEntropyLoss.softmax">
+<span class="sig-name descname"><span class="pre">softmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.loss.CrossEntropyLoss.softmax" title="Permalink to this definition"></a></dt>
+<dd><p>Returns probabilities for each class</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="network.loss.Loss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.loss.</span></span><span class="sig-name descname"><span class="pre">Loss</span></span><a class="headerlink" href="#network.loss.Loss" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract class for Loss</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="network.loss.Loss.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.loss.Loss.backward" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.loss.Loss.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.loss.Loss.forward" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-network.net">
+<span id="network-net-module"></span><h2>network.net module<a class="headerlink" href="#module-network.net" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="network.net.Net">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.net.</span></span><span class="sig-name descname"><span class="pre">Net</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SGD(mm)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">CELoss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L2_reg_term</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>MLP Model class</p>
+<dl>
+<dt>Currently supports:</dt><dd><p>Layers: Linear
+Activations: ReLU, LeakyReLU, BatchNorm
+Loss Criteria: CrossEntropyLoss (uses Softmax ‘activation’ on output layer)
+Optimizer: SGD + Momentum (Weight Decay added)
+Regularization:</p>
+<blockquote>
+<div><p>L2 Reg
+Dropout (Layer specific can set higher percent for near input layers)
+Batch Norm (chosen to toggle for whole network for convenience)</p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.add" title="Permalink to this definition"></a></dt>
+<dd><p>Add layer: e.g. Linear or Activation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.backward">
+<span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.backward" title="Permalink to this definition"></a></dt>
+<dd><p>Backward pass</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Forward pass</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.load_model">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.load_model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_classes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.predict" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.reset_gradients">
+<span class="sig-name descname"><span class="pre">reset_gradients</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.reset_gradients" title="Permalink to this definition"></a></dt>
+<dd><p>Zeros gradients in each layer after each training iteration</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.save_model">
+<span class="sig-name descname"><span class="pre">save_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.save_model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.set_name">
+<span class="sig-name descname"><span class="pre">set_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.set_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.test_network">
+<span class="sig-name descname"><span class="pre">test_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test</span> <span class="pre">data'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.test_network" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.train_batch">
+<span class="sig-name descname"><span class="pre">train_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.train_batch" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.train_convergence">
+<span class="sig-name descname"><span class="pre">train_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planned_epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.train_convergence" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.train_network">
+<span class="sig-name descname"><span class="pre">train_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.train_network" title="Permalink to this definition"></a></dt>
+<dd><p>Mini batch training.. separated from train that uses a dataloader which can also load batches, but
+I think that it could be overkill and also doesn’t shuffle / take random samples like it should</p>
+<p>This is not main train yet because not working well for low sizes, e.g. batch_size=1 or 2
+however, just noticed it might be related to the log function in ce loss</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.update" title="Permalink to this definition"></a></dt>
+<dd><p>Uses optimizer to update weights and biases in each layer based on saved dW and db</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.net.Net.validate_batch">
+<span class="sig-name descname"><span class="pre">validate_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valid_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.validate_batch" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="network.net.show_time">
+<span class="sig-prename descclassname"><span class="pre">network.net.</span></span><span class="sig-name descname"><span class="pre">show_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.show_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-network.optim">
+<span id="network-optim-module"></span><h2>network.optim module<a class="headerlink" href="#module-network.optim" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="network.optim.Adam">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.optim.</span></span><span class="sig-name descname"><span class="pre">Adam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-09</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.optim.Adam" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#network.optim.Optimizer" title="network.optim.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.optim.Optimizer</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="network.optim.Adam.add_to_dict">
+<span class="sig-name descname"><span class="pre">add_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.optim.Adam.add_to_dict" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.optim.Adam.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.optim.Adam.step" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="network.optim.Optimizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.optim.</span></span><span class="sig-name descname"><span class="pre">Optimizer</span></span><a class="headerlink" href="#network.optim.Optimizer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="network.optim.SGD">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.optim.</span></span><span class="sig-name descname"><span class="pre">SGD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_decay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">momentum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_decay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_terms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">0.5)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.optim.SGD" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#network.optim.Optimizer" title="network.optim.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.optim.Optimizer</span></code></a></p>
+<p>Stochastic Gradient Descent: Also implements weight decay (can be removed by setting to zero)</p>
+<p>To add momentum etc. just adds another terms</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="network.optim.SGD.exp_decay">
+<span class="sig-name descname"><span class="pre">exp_decay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.optim.SGD.exp_decay" title="Permalink to this definition"></a></dt>
+<dd><p>Return decayed lr by an exponential factor of time and chosen constant k (exp term)
+I have chosen k to factor in total training iters st lr magnitude pans over all planned epochs</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.optim.SGD.get_lr">
+<span class="sig-name descname"><span class="pre">get_lr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.optim.SGD.get_lr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.optim.SGD.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.optim.SGD.step" title="Permalink to this definition"></a></dt>
+<dd><p>Update weights and biases in each layer wrt learned dW and db AND learning rate (+ weight decay) term</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.optim.SGD.step_decay">
+<span class="sig-name descname"><span class="pre">step_decay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.optim.SGD.step_decay" title="Permalink to this definition"></a></dt>
+<dd><p>Return decreased lr by factor of “drop” (default: half) every “step” (default 10) epochs</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="network.optim.SGD.time_decay">
+<span class="sig-name descname"><span class="pre">time_decay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.optim.SGD.time_decay" title="Permalink to this definition"></a></dt>
+<dd><p>Return decreased lr by time_step factor (epoch * iter)</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-network">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-network" title="Permalink to this headline"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="network" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="network.dataset.html" class="btn btn-neutral float-right" title="network.dataset package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, COMP5329_Assignment_1.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
