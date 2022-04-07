@@ -470,23 +470,70 @@ weight values in a layer, however, can be used for biases as well.</p>
 <dt class="sig sig-object py" id="network.loss.CrossEntropyLoss">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.loss.</span></span><span class="sig-name descname"><span class="pre">CrossEntropyLoss</span></span><a class="headerlink" href="#network.loss.CrossEntropyLoss" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#network.loss.Loss" title="network.loss.Loss"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.loss.Loss</span></code></a></p>
-<p>Calc softmax then negative log-likelihood loss</p>
+<p>Calc softmax then negative log-likelihood loss
+Class for Cross-Entropy Loss. By default, this class applies Softmax activation on input mini-batch x
+to calculate probabilities for each class. These quantized probabilities for each class are then used
+in the calculation of Cross-Entropy Loss for backpropagation (training) of the network, or directly in
+making a prediction by taking the class with the maximum Softmax calculated probability.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.loss.CrossEntropyLoss.backward">
 <span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.loss.CrossEntropyLoss.backward" title="Permalink to this definition"></a></dt>
-<dd><p>Returns difference between softmax probs and ground truth for update</p>
+<dd><p>The backward pass of Cross-Entropy Loss calculates the derivative of Cross-Entropy Loss (loss function)
+using Softmax activation. Both Softmax probabilities and ground-truth labels are cached for the current
+mini-batch in the forward pass and used to calculate the derivative in the backward pass. This is simply
+the difference of probabilities with one-hot encoded ground-truth labels averaged over all the samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>derivative of Cross-Entropy Loss with Softmax activation averaged number of samples in mini-batch x.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.loss.CrossEntropyLoss.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.loss.CrossEntropyLoss.forward" title="Permalink to this definition"></a></dt>
-<dd><p>Uses softmax to calculate Cross entropy loss</p>
+<dd><p>The forward step in Cross-Entropy Loss is the calculation of the Cross-Entropy Loss value,
+determined by calculating Softmax probabilities for each class and taking the log-likelihood of
+probabilities which determines the negative average of log corrected predicted probabilities for
+the mini-batch x (ie. against true labels). The probabilities calculated with Softmax are cached
+along with ground-truth labels, to then be used for calculating the derivative of Cross-Entropy
+for the backward pass for updating weights/biases in each layer. Softmax probabilities are also
+returned for use in evaluating the accuracy of the model, or making predictions on unlabelled data.
+Epsilon is used to stabilize calculation of log Softmax where unwanted overflow/underflow side-effects
+could occur due to floating-point representation of small probability values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>np.ndarray</em>) – mini-batch x of values passed through in the forward pass of training / prediction</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns the calculated cross-entropy loss over mini-batch x;
+np.ndarray: also returns Softmax probabilities for each class for prediction / accuracy evaluation</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.loss.CrossEntropyLoss.softmax">
 <span class="sig-name descname"><span class="pre">softmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.loss.CrossEntropyLoss.softmax" title="Permalink to this definition"></a></dt>
-<dd><p>Returns probabilities for each class</p>
+<dd><p>Used for calculating the Softmax probabilities of each class. Acts as the default last activation in
+the layer prior to calculation of Cross Entropy Loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>np.ndarray</em>) – mini-batch x of values passed through in the forward pass of training / prediction</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns the probabilities for each class, the class with the highest probability is our predicted label</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -495,7 +542,8 @@ weight values in a layer, however, can be used for biases as well.</p>
 <dt class="sig sig-object py" id="network.loss.Loss">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.loss.</span></span><span class="sig-name descname"><span class="pre">Loss</span></span><a class="headerlink" href="#network.loss.Loss" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Abstract class for Loss</p>
+<p>Parent class for Loss Criterion</p>
+<p>This class is inherited by currently only supported child class: CrossEntropyLoss</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.loss.Loss.backward">
 <span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.loss.Loss.backward" title="Permalink to this definition"></a></dt>
