@@ -25,6 +25,9 @@ class ReLU(Activation):
     def __repr__(self):
         """
         Repr method for ReLU class, used in Net class when generating model names.
+
+        Returns:
+            str: returns the string representation of the class
         """
         return "ReLU"
 

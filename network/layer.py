@@ -1,6 +1,6 @@
 import numpy as np
 
-class Layer():
+class Layer:
     """
     Parent class for Hidden Layers
 
@@ -188,6 +188,7 @@ class Linear(Layer):
             np.ndarray: returns dx values whereby proportion (dropout) is randomly masked as zeros, turned off.
         """
         return dy * self.mask / (1 - self.dropout)
+
 
     def forward(self, x):
         """

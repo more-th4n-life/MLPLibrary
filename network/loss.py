@@ -15,7 +15,6 @@ class Loss:
 
 class CrossEntropyLoss(Loss):
     """
-    Calc softmax then negative log-likelihood loss
     Class for Cross-Entropy Loss. By default, this class applies Softmax activation on input mini-batch x
     to calculate probabilities for each class. These quantized probabilities for each class are then used 
     in the calculation of Cross-Entropy Loss for backpropagation (training) of the network, or directly in
@@ -28,6 +27,9 @@ class CrossEntropyLoss(Loss):
     def __repr__(self):
         """
         Repr method for CrossEntropyLoss class, used in Net class when generating model names.
+
+        Returns:
+            str: returns the string representation of the class
         """
         return "CELoss"
 
@@ -88,7 +90,9 @@ class CrossEntropyLoss(Loss):
         criterion, calling CrossEntropyLoss when making predictions should only return the Softmax probailities calculated for 
         each class. During prediction, it is implied that we do not know the ground-truth labels and so should account for this.
         If we do have ground-truth labels, we can calculate Cross-Entropy Loss wrt labels and return both loss and probabilities.
-    
+
+        Returns:
+            np.ndarray: values calculated from a forward pass of the model
         """
         return self.forward(x, label) if isinstance(label, np.ndarray) else self.softmax(x)
 

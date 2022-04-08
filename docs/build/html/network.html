@@ -470,8 +470,7 @@ weight values in a layer, however, can be used for biases as well.</p>
 <dt class="sig sig-object py" id="network.loss.CrossEntropyLoss">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.loss.</span></span><span class="sig-name descname"><span class="pre">CrossEntropyLoss</span></span><a class="headerlink" href="#network.loss.CrossEntropyLoss" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#network.loss.Loss" title="network.loss.Loss"><code class="xref py py-class docutils literal notranslate"><span class="pre">network.loss.Loss</span></code></a></p>
-<p>Calc softmax then negative log-likelihood loss
-Class for Cross-Entropy Loss. By default, this class applies Softmax activation on input mini-batch x
+<p>Class for Cross-Entropy Loss. By default, this class applies Softmax activation on input mini-batch x
 to calculate probabilities for each class. These quantized probabilities for each class are then used
 in the calculation of Cross-Entropy Loss for backpropagation (training) of the network, or directly in
 making a prediction by taking the class with the maximum Softmax calculated probability.</p>
@@ -563,18 +562,20 @@ the layer prior to calculation of Cross Entropy Loss.</p>
 <dt class="sig sig-object py" id="network.net.Net">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">network.net.</span></span><span class="sig-name descname"><span class="pre">Net</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SGD(mm)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">CELoss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L2_reg_term</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>MLP Model class</p>
-<dl>
-<dt>Currently supports:</dt><dd><p>Layers: Linear
-Activations: ReLU, LeakyReLU, BatchNorm
-Loss Criteria: CrossEntropyLoss (uses Softmax ‘activation’ on output layer)
-Optimizer: SGD + Momentum (Weight Decay added)
-Regularization:</p>
-<blockquote>
-<div><p>L2 Reg
-Dropout (Layer specific can set higher percent for near input layers)
-Batch Norm (chosen to toggle for whole network for convenience)</p>
-</div></blockquote>
+<p>Class for Neural Networks (Multi-Layer Perceptron models).
+Currently supports: Hidden Layers (Linear) and Activation functions (ReLU, LeakyReLU); Loss Criterion:
+CrossEntropyLoss (implicitly with Softmax activation); Optimizers: SGD (with or without Momentum and/or
+Weight decay) and Adam; Regularization: L2 Regularization over network, Dropout (specific to each layer)
+and Batch Normalization (toggled for whole network for ease of convenience).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optimizer</strong> (<a class="reference internal" href="#network.optim.Optimizer" title="network.optim.Optimizer"><em>Optimizer</em></a>) – Optimizer to be applied for updating weights and biases in each layer during training.</p></li>
+<li><p><strong>criterion</strong> (<a class="reference internal" href="#network.loss.Loss" title="network.loss.Loss"><em>Loss</em></a>) – Loss criterion used for the evaluation and optimization of minimizing the loss function.</p></li>
+<li><p><strong>batch_norm</strong> (<em>bool</em>) – Flag to toggle application of batch normalizations of Linear layers in the network.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Alpha term used in the calculation of running mean and variance in batch normalization.</p></li>
+<li><p><strong>L2_reg_term</strong> (<em>str</em>) – L2 regularization term used for penalizing larger weights in the network</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py method">
@@ -586,13 +587,39 @@ Batch Norm (chosen to toggle for whole network for convenience)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.backward">
 <span class="sig-name descname"><span class="pre">backward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.backward" title="Permalink to this definition"></a></dt>
-<dd><p>Backward pass</p>
+<dd><p>Main method for Net in making a backward pass in backpropagation. Passes the gradient of the loss
+function from the output layer to the input layer, which updates the weights and biases within the
+Linear layers with the objective of minimizing the calculation of the Loss function in subsequent
+iterations (i.e. improving model performance).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dy</strong> (<em>np.ndarray</em>) – passes the gradient of the loss function generated by the Loss criterion.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.forward" title="Permalink to this definition"></a></dt>
-<dd><p>Forward pass</p>
+<dd><p>Main method for Net in making a forward pass in training / prediction. Iterates from input layer to
+output layer each class’ forward function and passes forward predictions to use in calculating loss.
+Predict is set to false by default to indicate training is occuring - this modifies the control-flow
+within the Linear class, which specifically modifies the behaviour of batch normalization and dropout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – mini-batch x during forward pass of training or prediction.</p></li>
+<li><p><strong>predict</strong> (<em>bool</em>) – True if performing a forward pass in prediction, or False if model is in training.
+By default, set to false.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns output values of Net used for calculating Loss using the selected Criterion function</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -608,7 +635,7 @@ Batch Norm (chosen to toggle for whole network for convenience)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.reset_gradients">
 <span class="sig-name descname"><span class="pre">reset_gradients</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.reset_gradients" title="Permalink to this definition"></a></dt>
-<dd><p>Zeros gradients in each layer after each training iteration</p>
+<dd><p>Helper method to zero out gradients of weights and biases in each layer, called before each iteration of training.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -619,7 +646,8 @@ Batch Norm (chosen to toggle for whole network for convenience)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.set_name">
 <span class="sig-name descname"><span class="pre">set_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.set_name" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Setter method for model name, useful for saving / loading models for re-use in making prediction or for continuing training</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.test_network">
@@ -629,12 +657,54 @@ Batch Norm (chosen to toggle for whole network for convenience)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.train_batch">
 <span class="sig-name descname"><span class="pre">train_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.train_batch" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Method that performs a training step on mini-batch x. Makes a forward pass, calculates loss and probabilities with
+chosen loss criterion, then makes a backward pass to update the weights and biases of each Linear layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – mini-batch x of training set during forward pass of the training phase</p></li>
+<li><p><strong>label</strong> (<em>np.ndarray</em>) – ground-truth labels of mini-batch x, used for evaluating loss and accuracy</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns the calculated loss for the training iteration
+np.ndarray: also returns the proportion of correctly predicted labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.train_convergence">
 <span class="sig-name descname"><span class="pre">train_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planned_epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.train_convergence" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Method for training model using an objective criteria that measures “convergence.” Two conditions are used to measure convergence:
+(1) If training loss in a subsequent model is not below a selected N percentage threshold, then convergence is achieved; or
+(2) If validation loss in chosen M subsequent models is not less than the last best model with minimal validation loss, then convergence is achieved.
+Using these two disjunction of these two objectives, provides an approximate estimate for a good model using both the training loss
+to check if loss is not decreasing enough, and validation loss to suggest that no better model can be found within reasonable time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_set</strong> (<em>np.ndarray</em><em>, </em><em>np.ndarray</em>) – tuple whereby first index refers to training data and second index refers to training labels</p></li>
+<li><p><strong>valid_set</strong> (<em>np.ndarray</em><em>, </em><em>np.ndarray</em>) – tuple whereby first index refers to validation data and second index refers to validation labels</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – size of each mini-batch used within each training iteration (each epoch)</p></li>
+<li><p><strong>threshold</strong> (<em>float</em>) – a chosen percentage for the difference in training loss calculated each epoch to decide when to end training</p></li>
+<li><p><strong>report_interval</strong> (<em>int</em>) – represents the number of epochs before each reporting interval. If 10 is set, a report is produced each 10 epochs in training.</p></li>
+<li><p><strong>planned_epochs</strong> (<em>int</em>) – the maximum number of epoch to train model in the case that convergence criteria is not achieved within this time.</p></li>
+<li><p><strong>last_check</strong> (<em>int</em>) – number of models to check after best model with minimum validation loss, if none have lower validation loss then convergence is achieved.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns the calculated loss for the training iteration
+np.ndarray: also returns the proportion of correctly predicted labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.train_network">
@@ -648,13 +718,31 @@ however, just noticed it might be related to the log function in ce loss</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.update">
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.update" title="Permalink to this definition"></a></dt>
-<dd><p>Uses optimizer to update weights and biases in each layer based on saved dW and db</p>
+<dd><p>Update step that uses the selected optimizer to update the weights and biases of each Linear layer, using
+the differentials of the weights and biases within each layer (and parameters unique to the Optimizer algorithm)</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.validate_batch">
 <span class="sig-name descname"><span class="pre">validate_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valid_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.validate_batch" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Method that performs a validation step on mini-batch x. Makes a forward pass, calculates loss and probabilities with
+chosen loss criterion, then makes a backward pass to update the weights and biases of each Linear layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – mini-batch x of the validation set during forward pass of training</p></li>
+<li><p><strong>label</strong> (<em>np.ndarray</em>) – ground-truth of labels of mini-batch x, used for evaluating loss and accuracy</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns the calculated loss for the training iteration
+np.ndarray: also returns the proportion of correctly predicted labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
