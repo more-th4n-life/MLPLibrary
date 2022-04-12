@@ -35,7 +35,7 @@ algorithms supported for the updating of weights and biases in each layer includ
 
 ## To run driver code
 `trainer.py` contains driver code used whilst developing and testing our library functions.
-Functions within this file contain some sample code for the building, training and testing models. 
+Functions within this file contain some sample code for building, training and testing models. 
 ```
 python3 trainer.py
 ```
