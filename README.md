@@ -1,5 +1,6 @@
 # MLPLibrary
-A library for constructing MLP models, implemented with Numpy and Python. \\
+A library for constructing MLP models, implemented with Numpy and Python. \
+\
 Please refer to our detailed Sphinx auto-generated documentation found within the 
 ```docs/build/html``` sub-directory. 
 
