@@ -2,9 +2,9 @@ MLPLibrary Documentation Homepage
 ================================================
 
 MLPLibrary is an API library implemented in Numpy and Python, written for a University
-of Sydney Deep-Learning course, COMP5329. This work will late be extended as a passion
-project by it's collaborative writers: Michael Podbury, Niruth Bogahawatta and Billy Dodds. 
-This library API provides functionality for building, training and evaluation of MLP models. 
+of Sydney Deep-Learning course, however, will later be extended as a passion project by 
+it's writer, Michael Podbury. Currently, this library API provides the functionality for
+building, training and evaluation of simple MLP models for multi classification problems.
 
 .. _MLP: https://en.wikipedia.org/wiki/Multilayer_perceptron 
 
