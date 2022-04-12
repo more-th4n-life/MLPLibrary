@@ -2,11 +2,6 @@ import numpy as np
 from network.layer import Linear
 
 class Optimizer:
-    """
-    Parent Optimizer class. Attributes: epochs, epoch, iters and time_step are all set upon in the net function,
-    if using Adam, time_step is used. If SGD, these values are used to calculate using a selected decay method
-    upon initializaton, the learning rate for the next iteration in training.
-    """
     def __init__(self):
         self.epochs = None
         self.epoch = None
@@ -15,15 +10,9 @@ class Optimizer:
         
 class SGD(Optimizer):
     """
-    Class Stochastic Gradient Descent.
+    Stochastic Gradient Descent: Also implements weight decay (can be removed by setting to zero)
 
-    Args:
-        learning_rate (float): learning rate to control step size in traversing the loss function canyon :)
-        weight_decay (float): a term that is used to penalize weight values as a factor of learning rate
-        momentum (float): extra term to accelerate derivates towards minima points (speeds up convergence)
-        lr_decay (string): learning rate schedular, can choose from "default", "step", "exp" & "time" decay
-        step_terms (tuple): terms step i.e. num of epochs, before each drop (a factor it learning rate is reduced by)
-    
+    To add momentum etc. just adds another terms
     """
     def __init__(self, learning_rate=0.04, weight_decay = 0, momentum = 0.5, lr_decay = "default", step_terms = (10, 0.5)):
         super(Optimizer, self).__init__()
@@ -42,12 +31,6 @@ class SGD(Optimizer):
         self.step_terms = step_terms  # only used in step decay
 
     def __repr__(self):
-        """
-        Repr method for SGD class, used in Net class when generating model names.
-
-        Returns:
-            str: returns the string representation of the class
-        """
         if self.wd and self.momentum:
             return "SGD(wd+mm)"
         elif self.wd:
@@ -57,20 +40,11 @@ class SGD(Optimizer):
         return "SGD"
 
     def get_lr(self):
-        """
-        Getter method for learning rate
-
-        Returns:
-            float: learning rate
-        """
         return self.lr
 
     def time_decay(self):
         """
         Return decreased lr by time_step factor (epoch * iter)
-
-        Returns:
-            float: next lr value
         """
         k = self.lr / self.epochs
         return self.lr * (1 / (1 + k * self.time_step))
@@ -78,9 +52,6 @@ class SGD(Optimizer):
     def step_decay(self):
         """
         Return decreased lr by factor of "drop" (default: half) every "step" (default 10) epochs
-
-        Returns:
-            float: next lr value
         """
         step = self.step_terms[0]
         drop = self.step_terms[1]
@@ -91,9 +62,6 @@ class SGD(Optimizer):
         """
         Return decayed lr by an exponential factor of time and chosen constant k (exp term)
         I have chosen k to factor in total training iters st lr magnitude pans over all planned epochs
-
-        Returns:
-            float: next lr values
         """
         exp_term = 1 / self.iters
         return self.lr * np.exp(-exp_term * self.time_step)
@@ -118,15 +86,6 @@ class SGD(Optimizer):
 
 
 class Adam(Optimizer):
-    """
-    Class Adam optimizer
-
-    Args:
-        learning_rate (float): default 0.001
-        beta1 (float): default 0.9
-        beta2 (float): default 0.999
-        epsilon (float): default 1e-09, used for stability
-    """
 
     def __init__(self, learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-09):
         super(Optimizer, self).__init__()
@@ -140,18 +99,9 @@ class Adam(Optimizer):
         self.time_step = None
 
     def __repr__(self):
-        """
-        Repr method for SGD class, used in Net class when generating model names.
-
-        Returns:
-            str: returns the string representation of the class
-        """
         return "Adam"
 
     def add_to_dict(self, indim, outdim, i):
-        """
-        Helper class to initialize each codebook 
-        """
 
         self.v["dW" + str(i)] = np.zeros((indim, outdim))
         self.v["db" + str(i)] = np.zeros(outdim,)
@@ -160,15 +110,6 @@ class Adam(Optimizer):
         self.s["db" + str(i)] = np.zeros(outdim,)
     
     def step(self, network):
-        """
-        Update step in Adam: 
-        (1) Calculates moving average of gradients
-        (2) Corrects bias with first moment estimates
-        (3) Calculates moving average of squared gradients
-        (4) Corrects bias with second moment estimates
-        
-        Lastly, updates all parameters
-        """
 
         for k, layer in enumerate([L for L in network.layers if isinstance(L, Linear)]):
             

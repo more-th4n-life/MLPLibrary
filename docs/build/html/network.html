@@ -581,7 +581,13 @@ and Batch Normalization (toggled for whole network for ease of convenience).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.add">
 <span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.add" title="Permalink to this definition"></a></dt>
-<dd><p>Add layer: e.g. Linear or Activation</p>
+<dd><p>Net method to add a layer to the model, layers can be selected as either a Linear layer or as Activation function between
+layers (e.g. ReLU or LeakyReLU)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>layer</strong> (<a class="reference internal" href="#network.layer.Layer" title="network.layer.Layer"><em>Layer</em></a><em> or </em><a class="reference internal" href="#network.activ.Activation" title="network.activ.Activation"><em>Activation</em></a>) – Hidden layer to be added (either Linear or Activation function between Linear layers)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -630,7 +636,19 @@ By default, set to false.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.predict">
 <span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_classes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.predict" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Performs a forward pass and builds an array of predictions made for each example in the test data the output of applying Softmax on the mini-batch sample x</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>np.ndarray</em>) – a mini-batch x used in forward pass, for testing or making predictions</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns the probabilities for multi-classification by applying Softmax actuvation on the last layer’s output</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(np.ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.reset_gradients">
@@ -647,6 +665,11 @@ By default, set to false.</p></li>
 <dt class="sig sig-object py" id="network.net.Net.set_name">
 <span class="sig-name descname"><span class="pre">set_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.set_name" title="Permalink to this definition"></a></dt>
 <dd><p>Setter method for model name, useful for saving / loading models for re-use in making prediction or for continuing training</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – name for the model</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -667,11 +690,10 @@ chosen loss criterion, then makes a backward pass to update the weights and bias
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>returns the calculated loss for the training iteration
-np.ndarray: also returns the proportion of correctly predicted labels</p>
+<dd class="field-even"><p>returns the calculated loss for the training iteration and proportion of correctly predicted labels</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dd class="field-odd"><p>np.ndarray, np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -697,11 +719,11 @@ to check if loss is not decreasing enough, and validation loss to suggest that n
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>returns the calculated loss for the training iteration
-np.ndarray: also returns the proportion of correctly predicted labels</p>
+<dd class="field-even"><p>returns best model epoch, training loss log, training accuracy log, validation loss log
+and validation accuracy log.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dd class="field-odd"><p>int, np.ndarray, np.ndarray, np.ndarray, np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -709,10 +731,25 @@ np.ndarray: also returns the proportion of correctly predicted labels</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="network.net.Net.train_network">
 <span class="sig-name descname"><span class="pre">train_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#network.net.Net.train_network" title="Permalink to this definition"></a></dt>
-<dd><p>Mini batch training.. separated from train that uses a dataloader which can also load batches, but
-I think that it could be overkill and also doesn’t shuffle / take random samples like it should</p>
-<p>This is not main train yet because not working well for low sizes, e.g. batch_size=1 or 2
-however, just noticed it might be related to the log function in ce loss</p>
+<dd><p>Method for training model over a selected (fixed) number of epochs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_set</strong> (<em>np.ndarray</em><em>, </em><em>np.ndarray</em>) – tuple whereby first index refers to training data and second index refers to training labels</p></li>
+<li><p><strong>valid_set</strong> (<em>np.ndarray</em><em>, </em><em>np.ndarray</em>) – tuple whereby first index refers to validation data and second index refers to validation labels</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – size of each mini-batch used within each training iteration (each epoch)</p></li>
+<li><p><strong>epochs</strong> (<em>int</em>) – number of epochs to train the network</p></li>
+<li><p><strong>report_interval</strong> (<em>int</em>) – represents the number of epochs before each reporting interval. If 10 is set, a report is produced each 10 epochs in training.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns best model epoch, training loss log, training accuracy log, validation loss log
+and validation accuracy log.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int, np.ndarray, np.ndarray, np.ndarray, np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -735,11 +772,10 @@ chosen loss criterion, then makes a backward pass to update the weights and bias
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>returns the calculated loss for the training iteration
-np.ndarray: also returns the proportion of correctly predicted labels</p>
+<dd class="field-even"><p>returns the calculated loss for the training iteration and proportion of correctly predicted labels</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dd class="field-odd"><p>np.ndarray, np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>

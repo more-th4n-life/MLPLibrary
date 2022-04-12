@@ -428,18 +428,6 @@ class Net:
 
 
     def test_network(self, test_set, data="test data"):
-        """
-        Method for testing the network, first performs a forward pass to predict the labels for mini-batch x. This is then used against
-        ground-truth labels to calculate accuracy, and also includes the number of correct predictions (accuracy) for each class label 
-
-        Args:
-            x (np.ndarray): a test mini-batch x used in forward pass, for testing or making predictions
-            data (str): default value test data which is used in formatting the statistics of correct predictions made on
-                            the kind of data x belongs to. This can be over-ridden, and used to format output for accuracy results
-                            of train, validaton and test data.
-        
-        """
-
         x, labels = test_set
         n_classes = labels.shape[1]
 
@@ -498,20 +486,6 @@ class Net:
     ############################################################
     
     def save_model(self, train=False):
-        """
-        Instance method for saving a Net object (i.e. it's state) whenever it is called.
-        Mostly used during training, whereby when validation loss is minimized by the model
-        in this epoch - it's state is saved as the 'best model' representation of itself.
-
-        Args:
-            train (bool): Used to control the flow of execution when training, not to print
-            output message for successful / unsuccessful save as this is done repeatedly.
-
-        Returns:
-            None: The recursive return statement is used to try saving a model again, when
-            the model directly does not yet exist within the adjacent subfolder this method
-            is called.
-        """
         file_path = os.path.join(os.getcwd(), 'model')
         if os.path.exists(file_path):
             try:
@@ -534,15 +508,6 @@ class Net:
     
     @staticmethod
     def load_model(file_path):
-        """
-        Class method used for loading a Net object. Can be used for loading any model 
-        saved previously, or to reload the same network (self), but as a previous state
-        that is deemed *best model* in minimizing validation loss.
-
-        Args:
-            file_path (str): File path where the model is stored. Usually file path refers
-            to a `model` sub-directory.
-        """
         try:
             with open(file_path, "rb") as file:
                 return pickle.load(file)
